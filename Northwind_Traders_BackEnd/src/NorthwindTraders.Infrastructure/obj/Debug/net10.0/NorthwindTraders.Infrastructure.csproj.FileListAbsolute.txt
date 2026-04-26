@@ -1,0 +1,17 @@
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Infrastructure.deps.json
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Infrastructure.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Infrastructure.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Application.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Domain.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Domain.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Application.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.AssemblyInfo.cs
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\Northwin.A0C2115C.Up2Date
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\refint\NorthwindTraders.Infrastructure.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\ref\NorthwindTraders.Infrastructure.dll

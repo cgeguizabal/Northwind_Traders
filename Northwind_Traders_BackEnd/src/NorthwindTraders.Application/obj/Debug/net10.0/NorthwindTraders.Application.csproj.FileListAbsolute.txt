@@ -1,0 +1,15 @@
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\bin\Debug\net10.0\NorthwindTraders.Application.deps.json
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\bin\Debug\net10.0\NorthwindTraders.Application.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\bin\Debug\net10.0\NorthwindTraders.Application.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\bin\Debug\net10.0\NorthwindTraders.Domain.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\bin\Debug\net10.0\NorthwindTraders.Domain.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.csproj.AssemblyReference.cache
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.AssemblyInfoInputs.cache
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.AssemblyInfo.cs
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.csproj.CoreCompileInputs.cache
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\Northwin.30950905.Up2Date
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\refint\NorthwindTraders.Application.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.pdb
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\ref\NorthwindTraders.Application.dll
