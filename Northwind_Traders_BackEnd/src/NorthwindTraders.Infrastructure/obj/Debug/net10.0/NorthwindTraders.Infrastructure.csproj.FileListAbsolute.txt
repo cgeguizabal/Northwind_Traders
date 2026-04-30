@@ -15,3 +15,6 @@ C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\Nort
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\refint\NorthwindTraders.Infrastructure.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.pdb
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\ref\NorthwindTraders.Infrastructure.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\bin\Debug\net10.0\NorthwindTraders.Infrastructure.runtimeconfig.json
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.sourcelink.json
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Infrastructure\obj\Debug\net10.0\NorthwindTraders.Infrastructure.genruntimeconfig.cache

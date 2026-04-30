@@ -9,3 +9,4 @@ C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\Nort
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Domain\obj\Debug\net10.0\refint\NorthwindTraders.Domain.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Domain\obj\Debug\net10.0\NorthwindTraders.Domain.pdb
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Domain\obj\Debug\net10.0\ref\NorthwindTraders.Domain.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Domain\obj\Debug\net10.0\NorthwindTraders.Domain.sourcelink.json

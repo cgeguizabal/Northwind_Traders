@@ -13,3 +13,4 @@ C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\Nort
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\refint\NorthwindTraders.Application.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.pdb
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\ref\NorthwindTraders.Application.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.Application\obj\Debug\net10.0\NorthwindTraders.Application.sourcelink.json
