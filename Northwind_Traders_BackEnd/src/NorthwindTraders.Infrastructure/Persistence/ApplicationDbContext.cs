@@ -14,7 +14,9 @@ public class ApplicationDbContext : DbContext // Inherit from EF Core's DbContex
 {
     // Constructor receives options (connection string, provider, etc.)
     // from Dependency Injection — configured in Program.cs
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) // ApplicationDbContext is configured in Program.cs to receive options from DI, which includes the connection string and database provider (e.g., SQL Server, SQLite). We pass these options to the base DbContext constructor.
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) // ApplicationDbContext is configured in Program.cs to receive options from DI, 
+                                                                                                //which includes the connection string and database provider (e.g., SQL Server, SQLite).  
+                                                                                                //  We pass these options to the base DbContext constructor.
     {
     }
 
