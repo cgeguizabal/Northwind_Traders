@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "wSstELT1CO8=",
+  "dgSpecHash": "liNUy8lc0ms=",
   "success": true,
   "projectFilePath": "C:\\Users\\cgegu\\Documents\\RSM\\NorthwindTraders\\Northwind_Traders_BackEnd\\src\\NorthwindTraders.API\\NorthwindTraders.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\cgegu\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\cgegu\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
+    "C:\\Users\\cgegu\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
     "C:\\Users\\cgegu\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\cgegu\\.nuget\\packages\\mediatr\\14.1.0\\mediatr.14.1.0.nupkg.sha512",
     "C:\\Users\\cgegu\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
