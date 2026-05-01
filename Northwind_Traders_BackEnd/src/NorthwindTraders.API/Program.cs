@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;            // EF Core — UseSqlServer lives here
 using NorthwindTraders.Infrastructure.Persistence;
+using NorthwindTraders.Infrastructure.Repositories;
+using NorthwindTraders.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 var app = builder.Build();
 
