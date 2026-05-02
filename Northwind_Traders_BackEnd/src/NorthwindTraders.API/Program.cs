@@ -1,34 +1,73 @@
-using Microsoft.EntityFrameworkCore;            // EF Core — UseSqlServer lives here
+using System.Text;                                              // C# built in
+using Microsoft.AspNetCore.Authentication.JwtBearer;           // JWT package
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;                          // JWT package
+using NorthwindTraders.Domain.Interfaces;
 using NorthwindTraders.Infrastructure.Persistence;
 using NorthwindTraders.Infrastructure.Repositories;
-using NorthwindTraders.Domain.Interfaces;
+using NorthwindTraders.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ── DATABASE ──────────────────────────────────────────────────────────────────
-
-// AddDbContext — EF Core Method
-// Registers ApplicationDbContext with the DI container
-// Every time something asks for ApplicationDbContext,
-// DI creates one with these settings automatically
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-
-    // UseSqlServer — EF Core Method
-    // Tells EF Core to use SQL Server as the database provider
-    // GetConnectionString — C# Method from Microsoft.Extensions.Configuration
-    // Reads "DefaultConnection" value from appsettings.json
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+// ── REPOSITORIES ──────────────────────────────────────────────────────────────
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
+// ── SERVICES ──────────────────────────────────────────────────────────────────
+// AddScoped — JwtService needs IConfiguration which is a singleton, scoped is fine here
+builder.Services.AddScoped<JwtService>();
+
+// ── JWT AUTHENTICATION ────────────────────────────────────────────────────────
+// AddAuthentication — C# built in ASP.NET Core Method
+// Tells ASP.NET Core: "use JWT bearer tokens as the auth scheme"
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        // TokenValidationParameters — JWT package — defines what to check on every token
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer           = true,   // check the Issuer claim matches
+            ValidateAudience         = true,   // check the Audience claim matches
+            ValidateLifetime         = true,   // reject expired tokens
+            ValidateIssuerSigningKey = true,   // verify the signature
+
+            ValidIssuer      = builder.Configuration["Jwt:Issuer"],
+            ValidAudience    = builder.Configuration["Jwt:Audience"],
+
+            // SymmetricSecurityKey — JWT package — recreates the key to verify signature
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
 
 // ── API BASICS ────────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+// Configure Swagger to accept JWT tokens
+// This adds the Authorize button in Swagger UI
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+    {
+        Name         = "Authorization",
+        Type         = Microsoft.OpenApi.SecuritySchemeType.Http,
+        Scheme       = "Bearer",
+        BearerFormat = "JWT",
+        In           = Microsoft.OpenApi.ParameterLocation.Header,
+        Description  = "Enter your JWT token. Example: eyJhbGci..."
+    });
+
+    options.AddSecurityRequirement(document => new Microsoft.OpenApi.OpenApiSecurityRequirement
+    {
+        [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+});
 
 var app = builder.Build();
 
@@ -40,14 +79,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();    // ← MUST come before UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
 
-//──────── SEEDER ───────────────────────────────────────────────────────
-using (var scope = app.Services.CreateScope())  // C# built in DI — creates a temporary scope
+// ── SEEDER ────────────────────────────────────────────────────────────────────
+using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // C# DI Method
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await EmployeeSeeder.SeedAsync(context);
 }
-app.Run();
 
+app.Run();
