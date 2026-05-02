@@ -20,6 +20,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+
+
 // ── API BASICS ────────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -41,4 +43,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
+//──────── SEEDER ───────────────────────────────────────────────────────
+using (var scope = app.Services.CreateScope())  // C# built in DI — creates a temporary scope
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // C# DI Method
+    await EmployeeSeeder.SeedAsync(context);
+}
 app.Run();
+
