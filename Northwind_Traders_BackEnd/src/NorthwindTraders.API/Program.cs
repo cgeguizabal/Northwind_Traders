@@ -21,6 +21,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 // ── SERVICES ──────────────────────────────────────────────────────────────────
 // AddScoped — JwtService needs IConfiguration which is a singleton, scoped is fine here
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<PdfService>();
 
 // ── JWT AUTHENTICATION ────────────────────────────────────────────────────────
 // AddAuthentication — C# built in ASP.NET Core Method
