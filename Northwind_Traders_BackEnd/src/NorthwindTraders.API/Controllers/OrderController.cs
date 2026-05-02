@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;                      // C#
 using NorthwindTraders.Application.DTOs.Order;
 using NorthwindTraders.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using NorthwindTraders.Infrastructure.Services;
 
 namespace NorthwindTraders.API.Controllers;
 
@@ -11,11 +12,13 @@ namespace NorthwindTraders.API.Controllers;
 public class OrdersController : ControllerBase      // C#
 {
     private readonly IOrderRepository _repository;
+    private readonly PdfService _pdfService;
 
-    public OrdersController(IOrderRepository repository)
-    {
-        _repository = repository;
-    }
+    public OrdersController(IOrderRepository repository, PdfService pdfService)
+{
+    _repository = repository;
+    _pdfService = pdfService;
+}
 
     // GET api/orders
     [HttpGet]
@@ -138,4 +141,54 @@ public class OrdersController : ControllerBase      // C#
 
         return NoContent();                          // C# — HTTP 204
     }
+
+
+    // GET api/v1/orders/10248/pdf
+[HttpGet("{id}/pdf")]
+public async Task<IActionResult> GetPdf(int id)
+{
+    var order = await _repository.GetOrderWithDetailsAsync(id);
+
+    if (order is null)
+        return NotFound($"Order with id {id} was not found.");
+
+    var dto = new OrderDetailDto
+    {
+        OrderId        = order.OrderId,
+        OrderDate      = order.OrderDate,
+        RequiredDate   = order.RequiredDate,
+        ShippedDate    = order.ShippedDate,
+        Freight        = order.Freight,
+        ShipmentStatus = order.ShipmentState?.Name,
+        ShipName       = order.ShipName,
+        ShipAddress    = order.ShipAddress,
+        ShipCity       = order.ShipCity,
+        ShipRegion     = order.ShipRegion,
+        ShipPostalCode = order.ShipPostalCode,
+        ShipCountry    = order.ShipCountry,
+        BillAddress    = order.BillAddress,
+        BillCity       = order.BillCity,
+        BillCountry    = order.BillCountry,
+        CustomerName   = order.Customer?.CompanyName,
+        EmployeeName   = order.Employee is not null
+                           ? $"{order.Employee.FirstName} {order.Employee.LastName}"
+                           : null,
+        ShipperName    = order.Shipper?.CompanyName,
+        Lines          = order.OrderDetails.Select(od => new OrderLineDto
+        {
+            ProductName = od.Product?.ProductName ?? "Unknown",
+            UnitPrice   = od.UnitPrice,
+            Quantity    = od.Quantity,
+            Discount    = od.Discount
+        }).ToList()
+    };
+
+    var pdfBytes = _pdfService.GenerateOrderPdf(dto);
+
+    // File — ControllerBase Method
+    // pdfBytes     = the raw PDF binary
+    // application/pdf = MIME type — tells the browser what type of file this is
+    // Order_{id}.pdf  = suggested filename when the browser downloads it
+    return File(pdfBytes, "application/pdf", $"Order_{id}.pdf");
+}
 }
