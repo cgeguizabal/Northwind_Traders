@@ -23,7 +23,9 @@ public class EmployeesController : ControllerBase   // C# — base class for API
     }
 
     // GET api/employees
-    [HttpGet]                                        // C# attribute — maps HTTP GET to this method
+    [HttpGet] // C# attribute — maps HTTP GET to this method
+     
+    [AllowAnonymous]// This one is open to everyone — overrides the controller [Authorize]
     public async Task<IActionResult> GetAll()
     {
         var employees = await _repository.GetAllAsync();
