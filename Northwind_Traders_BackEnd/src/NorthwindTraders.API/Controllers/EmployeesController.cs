@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;                      // C# — ControllerBase, HTTP attributes
 using NorthwindTraders.Application.DTOs.Employee;
 using NorthwindTraders.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;            // C# — [Authorize] attribute
 
 namespace NorthwindTraders.API.Controllers;
 
@@ -9,6 +10,7 @@ namespace NorthwindTraders.API.Controllers;
 // "api/[controller]" → "api/employees" — [controller] is replaced with the class name minus "Controller"
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize] 
 public class EmployeesController : ControllerBase   // C# — base class for API controllers, no view support
 {
     private readonly IEmployeeRepository _repository;

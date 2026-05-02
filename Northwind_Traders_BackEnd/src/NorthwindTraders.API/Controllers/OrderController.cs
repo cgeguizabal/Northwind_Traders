@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;                      // C#
 using NorthwindTraders.Application.DTOs.Order;
 using NorthwindTraders.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NorthwindTraders.API.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize] // Require authentication for all endpoints in this controller
 public class OrdersController : ControllerBase      // C#
 {
     private readonly IOrderRepository _repository;

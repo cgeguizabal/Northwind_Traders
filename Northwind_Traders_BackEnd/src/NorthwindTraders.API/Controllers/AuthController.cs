@@ -7,6 +7,7 @@ namespace NorthwindTraders.API.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+
 public class AuthController : ControllerBase
 {
     private readonly IEmployeeRepository _employeeRepository;
