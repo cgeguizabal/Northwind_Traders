@@ -169,3 +169,4 @@ C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\Nort
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\BCrypt.Net-Next.dll
