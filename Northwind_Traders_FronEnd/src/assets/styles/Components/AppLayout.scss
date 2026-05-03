@@ -1,0 +1,36 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-layout__main {
+  margin-left: $sidebar-width;
+  flex:        1;
+  min-width:   0;
+  transition:  margin-left 0.3s ease;
+
+  &.expanded { margin-left: $sidebar-collapsed-width; }
+
+  @include mobile { margin-left: 0; }
+}
+
+.app-layout__content {
+  min-height: calc(100vh - 64px);
+  padding:    $spacing-lg;
+}
+
+// Mobile overlay behind the sidebar
+.app-layout__overlay {
+  display: none;
+
+  @include mobile {
+    display:    block;
+    position:   fixed;
+    inset:      0;
+    z-index:    $z-sidebar - 1;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
