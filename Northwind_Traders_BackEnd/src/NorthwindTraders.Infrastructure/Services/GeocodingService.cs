@@ -47,6 +47,9 @@ public class GeocodingService
         var root   = doc.RootElement;
         var status = root.GetProperty("status").GetString();
 
+        if (status != "OK")
+    return Result<(string, decimal, decimal)>.Failure(
+        $"Geocoding failed with status: {status}");
         
         // Navigate the JSON tree to get results[0]
         var results  = root.GetProperty("results");
