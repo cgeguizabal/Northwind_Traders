@@ -196,7 +196,7 @@ public async Task<IActionResult> GetPdf(int id)
 
 // POST api/v1/orders/10248/geocode
 [HttpPost("{id}/geocode")]
-[Authorize]   // only logged in employees can trigger geocoding
+[AllowAnonymous]   // only logged in employees can trigger geocoding
 public async Task<IActionResult> Geocode(int id)
 {
     // GeocodingService handles finding the order and saving results
