@@ -95,6 +95,7 @@ public class OrdersController : ControllerBase      // C#
                 ShipperName    = order.Shipper?.CompanyName,
                 Lines          = order.OrderDetails.Select(od => new OrderLineDto
                 {
+                    ProductId   = od.ProductId,
                     ProductName = od.Product?.ProductName ?? "Unknown",
                     UnitPrice   = od.UnitPrice,
                     Quantity    = od.Quantity,
@@ -204,6 +205,7 @@ public class OrdersController : ControllerBase      // C#
                 RequiredDate   = order.RequiredDate,
                 ShippedDate    = order.ShippedDate,
                 Freight        = order.Freight,
+                ShipmentStateId = order.ShipmentStateId,
                 ShipmentStatus = order.ShipmentState?.Name,
                 ShipName       = order.ShipName,
                 ShipAddress    = order.ShipAddress,
@@ -221,6 +223,7 @@ public class OrdersController : ControllerBase      // C#
                 ShipperName    = order.Shipper?.CompanyName,
                 Lines          = order.OrderDetails.Select(od => new OrderLineDto
                 {
+                    ProductId   = od.ProductId,
                     ProductName = od.Product?.ProductName ?? "Unknown",
                     UnitPrice   = od.UnitPrice,
                     Quantity    = od.Quantity,

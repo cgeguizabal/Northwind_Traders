@@ -6,8 +6,8 @@ namespace NorthwindTraders.Application.DTOs.Employee;
 public class EmployeeDto
 {
     public int EmployeeId { get; set; }
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
+    public string? FirstName { get; set; } 
+    public string? LastName { get; set; } 
     public string? Title { get; set; }
     public string? TitleOfCourtesy { get; set; }
     public string? City { get; set; }

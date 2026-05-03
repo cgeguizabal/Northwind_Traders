@@ -8,7 +8,8 @@ public class OrderDetailDto
     public DateTime? RequiredDate { get; set; }
     public DateTime? ShippedDate { get; set; }
     public decimal? Freight { get; set; }
-    public string? ShipmentStatus { get; set; }
+    public int?      ShipmentStateId { get; set; }
+    public string?   ShipmentStatus { get; set; }
 
     // Shipping
     public string? ShipName { get; set; }
@@ -39,6 +40,7 @@ public class OrderDetailDto
 // Each product line inside a full order
 public class OrderLineDto
 {
+    public int    ProductId   { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public short Quantity { get; set; }
