@@ -1,0 +1,23 @@
+@use '../variables' as *;
+
+.chart-wrapper {
+  background:    rgba(255, 255, 255, 0.04);
+  border:        1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-lg;
+  padding:       $spacing-lg;
+  display:       flex;
+  flex-direction: column;
+}
+
+.chart-canvas {
+  position: relative;
+  flex:     1;
+  height:   300px;
+}
+
+.chart-title {
+  font-size:     $font-size-base;
+  font-weight:   600;
+  margin-bottom: $spacing-md;
+  color:         var(--text-muted);
+}
