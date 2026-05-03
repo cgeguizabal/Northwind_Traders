@@ -26,7 +26,11 @@ public class DashboardService
         // C# cast to decimal needed because Discount is float
         var totalRevenue = await _context.OrderDetails
             .SumAsync(od => od.UnitPrice * od.Quantity * (decimal)(1 - od.Discount));
+        // ── TOTAL CUSTOMERS ───────────────────────────────────────────────────────────────────
+        var totalCustomers = await _context.Customers.CountAsync();
 
+        // ── TOTAL EMPLOYEES ───────────────────────────────────────────────────────────────────
+        var totalEmployees = await _context.Employees.CountAsync();
         // ── ORDERS BY STATUS ──────────────────────────────────────────────────
         // GroupBy — EF Core translates to SQL GROUP BY
         var ordersByStatus = await _context.Orders
@@ -74,6 +78,8 @@ public class DashboardService
         {
             TotalOrders    = totalOrders,
             TotalRevenue   = totalRevenue,
+            TotalCustomers = totalCustomers,
+            TotalEmployees = totalEmployees,
             OrdersByStatus = ordersByStatus,
             TopCustomers   = topCustomers,
             TopEmployees   = topEmployees
