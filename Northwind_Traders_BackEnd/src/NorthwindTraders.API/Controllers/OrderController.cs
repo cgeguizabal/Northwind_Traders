@@ -41,6 +41,7 @@ public class OrdersController : ControllerBase      // C#
                 Freight        = o.Freight,
                 ShipName       = o.ShipName,
                 ShipCity       = o.ShipCity,
+                ShipRegion     = o.ShipRegion,
                 ShipCountry    = o.ShipCountry,
                 CustomerName   = o.Customer?.CompanyName,
                 EmployeeName   = o.Employee is not null
@@ -82,6 +83,8 @@ public class OrdersController : ControllerBase      // C#
                 ShipRegion     = order.ShipRegion,
                 ShipPostalCode = order.ShipPostalCode,
                 ShipCountry    = order.ShipCountry,
+                ShipLatitude   = order.ShipLatitude,
+                ShipLongitude  = order.ShipLongitude,
                 BillAddress    = order.BillAddress,
                 BillCity       = order.BillCity,
                 BillCountry    = order.BillCountry,

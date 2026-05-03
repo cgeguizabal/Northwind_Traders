@@ -11,6 +11,7 @@ public class OrderSummaryDto
     public decimal? Freight { get; set; }
     public string? ShipName { get; set; }
     public string? ShipCity { get; set; }
+    public string? ShipRegion { get; set; }
     public string? ShipCountry { get; set; }
 
     // Human readable names instead of raw FK ids

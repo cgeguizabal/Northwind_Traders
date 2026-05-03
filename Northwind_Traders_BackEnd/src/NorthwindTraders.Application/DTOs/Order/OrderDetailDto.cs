@@ -18,6 +18,10 @@ public class OrderDetailDto
     public string? ShipPostalCode { get; set; }
     public string? ShipCountry { get; set; }
 
+    // Geocoded shipping coordinates (null if not yet geocoded)
+    public decimal? ShipLatitude  { get; set; }
+    public decimal? ShipLongitude { get; set; }
+
     // Billing
     public string? BillAddress { get; set; }
     public string? BillCity { get; set; }

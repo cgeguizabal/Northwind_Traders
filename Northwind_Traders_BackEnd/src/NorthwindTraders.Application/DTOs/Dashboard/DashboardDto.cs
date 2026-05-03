@@ -4,6 +4,8 @@ public class DashboardDto
 {
     public int TotalOrders { get; set; }
     public decimal TotalRevenue { get; set; }
+    public int TotalCustomers { get; set; }
+    public int TotalEmployees { get; set; }
 
     // Orders grouped by shipment status
     public List<OrdersByStatusDto> OrdersByStatus { get; set; } = [];
