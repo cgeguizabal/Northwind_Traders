@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NorthwindTraders.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+efa54ffe29b191dae2d0dd6cc5adb0b71f96c10e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba15660c84c582a7842d2715a9996a8c9d87e32f")]
 [assembly: System.Reflection.AssemblyProductAttribute("NorthwindTraders.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NorthwindTraders.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
