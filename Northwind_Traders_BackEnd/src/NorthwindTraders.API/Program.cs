@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
     .         Get<string[]>() ?? [];
                 policy.WithOrigins(allowedOrigins)
 
-                
+
             // AllowAnyHeader — allow any HTTP header (Authorization, Content-Type, etc.)
             .AllowAnyHeader()
             // AllowAnyMethod — allow GET, POST, PUT, DELETE, OPTIONS, etc.
@@ -105,6 +105,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend"); 
 app.UseAuthentication();    // MUST come before UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
