@@ -3,7 +3,7 @@ using NorthwindTraders.Application.DTOs.Order;
 using NorthwindTraders.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using NorthwindTraders.Infrastructure.Services;
-using ClosedXML.Excel;
+
 
 namespace NorthwindTraders.API.Controllers;
 
@@ -347,7 +347,7 @@ public async Task<IActionResult> ExportExcel()
     // POST api/v1/orders/geocode-all
     // Geocodes all orders that have no coordinates yet
     [HttpPost("geocode-all")]
-    [Authorize]
+    
    
     public async Task<IActionResult> GeocodeAll()
     {
