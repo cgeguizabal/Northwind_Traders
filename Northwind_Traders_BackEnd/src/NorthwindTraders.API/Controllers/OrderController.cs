@@ -182,6 +182,7 @@ public class OrdersController : ControllerBase      // C#
 
     // GET api/v1/orders/10248/pdf
     [HttpGet("{id}/pdf")]
+    
     public async Task<IActionResult> GetPdf(int id)
     {
         try
@@ -238,7 +239,7 @@ public class OrdersController : ControllerBase      // C#
 
     // POST api/v1/orders/10248/geocode
     [HttpPost("{id}/geocode")]
-    [AllowAnonymous]
+   
     public async Task<IActionResult> Geocode(int id)
     {
         try
@@ -272,7 +273,7 @@ public class OrdersController : ControllerBase      // C#
     // POST api/v1/orders/geocode-all
     // Geocodes all orders that have no coordinates yet
     [HttpPost("geocode-all")]
-    [AllowAnonymous]
+   
     public async Task<IActionResult> GeocodeAll()
     {
         try
