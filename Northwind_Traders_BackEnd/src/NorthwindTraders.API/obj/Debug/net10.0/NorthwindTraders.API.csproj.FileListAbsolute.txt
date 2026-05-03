@@ -212,3 +212,11 @@ C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\Nort
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\runtimes\win-x86\native\libwinpthread-1.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\runtimes\win-x86\native\qpdf.dll
 C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\runtimes\win-x86\native\zlib1.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\ClosedXML.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\ClosedXML.Parser.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\ExcelNumberFormat.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\RBush.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\SixLabors.Fonts.dll
+C:\Users\cgegu\Documents\RSM\NorthwindTraders\Northwind_Traders_BackEnd\src\NorthwindTraders.API\bin\Debug\net10.0\System.IO.Packaging.dll
