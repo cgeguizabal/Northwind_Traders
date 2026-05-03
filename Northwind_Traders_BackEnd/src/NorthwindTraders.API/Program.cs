@@ -20,6 +20,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>(); 
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>(); 
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
 
 // ── SERVICES ──────────────────────────────────────────────────────────────────
 // AddScoped — JwtService needs IConfiguration which is a singleton, scoped is fine here
