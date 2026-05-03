@@ -10,10 +10,11 @@ namespace NorthwindTraders.Domain.Interfaces;
 
 public interface ICustomerRepository
 {
-    Task<Customer?> GetByIdAsync(string customerId);        // string PK
+    Task<Customer?> GetByIdAsync(string customerId);         // string PK
     Task<IReadOnlyList<Customer>> GetAllAsync();
     Task<Customer?> GetByCompanyNameAsync(string companyName);
     Task AddAsync(Customer customer);
     void Update(Customer customer);
     Task<int> SaveChangesAsync();
+    Task<IReadOnlyList<Order>> GetOrdersByCustomerAsync(string customerId);
 }
