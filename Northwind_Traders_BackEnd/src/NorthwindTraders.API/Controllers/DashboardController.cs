@@ -6,6 +6,7 @@ namespace NorthwindTraders.API.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize] 
 public class DashboardController : ControllerBase
 {
     private readonly DashboardService _dashboardService;
@@ -17,7 +18,7 @@ public class DashboardController : ControllerBase
 
     // GET api/v1/dashboard
     [HttpGet]
-    [Authorize]    // only logged in employees can see the dashboard
+       // only logged in employees can see the dashboard
     public async Task<IActionResult> GetDashboard()
     {
         try

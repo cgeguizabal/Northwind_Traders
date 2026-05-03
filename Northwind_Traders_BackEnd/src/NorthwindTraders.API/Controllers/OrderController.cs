@@ -239,6 +239,7 @@ public class OrdersController : ControllerBase      // C#
 
     // POST api/v1/orders/10248/geocode
     [HttpPost("{id}/geocode")]
+    [Authorize]
    
     public async Task<IActionResult> Geocode(int id)
     {
@@ -273,6 +274,7 @@ public class OrdersController : ControllerBase      // C#
     // POST api/v1/orders/geocode-all
     // Geocodes all orders that have no coordinates yet
     [HttpPost("geocode-all")]
+    [Authorize]
    
     public async Task<IActionResult> GeocodeAll()
     {
