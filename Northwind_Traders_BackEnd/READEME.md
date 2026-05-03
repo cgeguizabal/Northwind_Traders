@@ -14,6 +14,7 @@ Employees can manage orders, customers, products, suppliers, categories, and shi
 | Database       | SQL Server                    |
 | Auth           | JWT Bearer Tokens             |
 | PDF Generation | QuestPDF                      |
+| Excel Export   | ClosedXML                     |
 | Geocoding      | Google Maps Geocoding API     |
 | Architecture   | Clean Architecture (4 layers) |
 
@@ -85,26 +86,10 @@ POST /api/v1/auth/login
 
 ```json
 {
-  "username": "your-username",
-  "password": "your-password"
+  "email": "nancy.davolio@northwind.com",
+  "password": "Northwind2025!"
 }
 ```
-
-### Test Credentials
-
-All employees share the same default password:
-
-| Name             | Email                          | Password       |
-| ---------------- | ------------------------------ | -------------- |
-| Nancy Davolio    | nancy.davolio@northwind.com    | Northwind2025! |
-| Andrew Fuller    | andrew.fuller@northwind.com    | Northwind2025! |
-| Janet Leverling  | janet.leverling@northwind.com  | Northwind2025! |
-| Margaret Peacock | margaret.peacock@northwind.com | Northwind2025! |
-| Steven Buchanan  | steven.buchanan@northwind.com  | Northwind2025! |
-| Michael Suyama   | michael.suyama@northwind.com   | Northwind2025! |
-| Robert King      | robert.king@northwind.com      | Northwind2025! |
-| Laura Callahan   | laura.callahan@northwind.com   | Northwind2025! |
-| Anne Dodsworth   | anne.dodsworth@northwind.com   | Northwind2025! |
 
 Returns:
 
@@ -119,6 +104,24 @@ Use this token in Swagger via the **Authorize** button, or in requests:
 ```
 Authorization: Bearer eyJhbGci...
 ```
+
+### Test Credentials
+
+All employees share the same default password. Employees with title **Vice President, Sales** or **Sales Manager** have access to the Employees management module.
+
+| Name             | Email                          | Title                    | Password       |
+| ---------------- | ------------------------------ | ------------------------ | -------------- |
+| Nancy Davolio    | nancy.davolio@northwind.com    | Sales Representative     | Northwind2025! |
+| Andrew Fuller    | andrew.fuller@northwind.com    | Vice President, Sales ⭐ | Northwind2025! |
+| Janet Leverling  | janet.leverling@northwind.com  | Sales Representative     | Northwind2025! |
+| Margaret Peacock | margaret.peacock@northwind.com | Sales Representative     | Northwind2025! |
+| Steven Buchanan  | steven.buchanan@northwind.com  | Sales Manager ⭐         | Northwind2025! |
+| Michael Suyama   | michael.suyama@northwind.com   | Sales Representative     | Northwind2025! |
+| Robert King      | robert.king@northwind.com      | Sales Representative     | Northwind2025! |
+| Laura Callahan   | laura.callahan@northwind.com   | Inside Sales Coordinator | Northwind2025! |
+| Anne Dodsworth   | anne.dodsworth@northwind.com   | Sales Representative     | Northwind2025! |
+
+> ⭐ These accounts have access to the Employees management module in the frontend.
 
 ---
 
@@ -140,11 +143,12 @@ Authorization: Bearer eyJhbGci...
 
 ### Employees
 
-| Method | Endpoint                     | Description                     |
-| ------ | ---------------------------- | ------------------------------- |
-| GET    | /api/v1/employees            | Get all employees               |
-| GET    | /api/v1/employees/{id}       | Get employee detail with orders |
-| GET    | /api/v1/employees/{id}/photo | Get employee photo (binary)     |
+| Method | Endpoint                     | Description                      |
+| ------ | ---------------------------- | -------------------------------- |
+| GET    | /api/v1/employees            | Get all employees                |
+| GET    | /api/v1/employees/{id}       | Get employee detail with orders  |
+| GET    | /api/v1/employees/{id}/photo | Get employee photo (binary)      |
+| PUT    | /api/v1/employees/{id}/title | Update employee title (managers) |
 
 ### Orders
 
@@ -153,11 +157,20 @@ Authorization: Bearer eyJhbGci...
 | GET    | /api/v1/orders                   | Get all orders                         |
 | GET    | /api/v1/orders/{id}              | Get full order detail                  |
 | GET    | /api/v1/orders/{id}/pdf          | Download order as PDF                  |
+| GET    | /api/v1/orders/export/excel      | Export all orders to Excel             |
 | GET    | /api/v1/orders/customer/{id}     | Get all orders for a customer          |
 | GET    | /api/v1/orders/status/{statusId} | Get orders filtered by shipment status |
-| PUT    | /api/v1/orders/{id}/status       | Update order shipment status           |
+| POST   | /api/v1/orders                   | Create a new order                     |
+| PUT    | /api/v1/orders/{id}              | Update an existing order               |
+| PUT    | /api/v1/orders/{id}/status       | Update order shipment status only      |
 | POST   | /api/v1/orders/{id}/geocode      | Geocode a single order                 |
 | POST   | /api/v1/orders/geocode-all       | Geocode all pending orders             |
+
+### Shipment States
+
+| Method | Endpoint               | Description             |
+| ------ | ---------------------- | ----------------------- |
+| GET    | /api/v1/shipmentstates | Get all shipment states |
 
 ### Products
 
@@ -194,6 +207,56 @@ Authorization: Bearer eyJhbGci...
 | Method | Endpoint          | Description         |
 | ------ | ----------------- | ------------------- |
 | GET    | /api/v1/dashboard | Get dashboard stats |
+
+---
+
+## Create Order — Example Body
+
+```json
+{
+  "customerId": "ALFKI",
+  "employeeId": 1,
+  "shipVia": 1,
+  "shipmentStateId": 1,
+  "orderDate": "2026-05-03T00:00:00",
+  "requiredDate": "2026-05-17T00:00:00",
+  "shippedDate": null,
+  "freight": 25.5,
+  "notes": "Please handle with care.",
+  "shipName": "Alfreds Futterkiste",
+  "shipAddress": "Obere Str. 57",
+  "shipCity": "Berlin",
+  "shipRegion": null,
+  "shipPostalCode": "12209",
+  "shipCountry": "Germany",
+  "billAddress": "Obere Str. 57",
+  "billCity": "Berlin",
+  "billRegion": null,
+  "billPostalCode": "12209",
+  "billCountry": "Germany",
+  "lines": [
+    {
+      "productId": 1,
+      "unitPrice": 18.0,
+      "quantity": 5,
+      "discount": 0.0
+    }
+  ]
+}
+```
+
+---
+
+## Geocoding Flow
+
+Order coordinates (`ShipLatitude`, `ShipLongitude`) are **not set on creation**. They are populated by calling the geocode endpoint after the order is saved:
+
+```
+1. POST /api/v1/orders                   → creates order, coordinates = null
+2. POST /api/v1/orders/{id}/geocode      → calls Google Maps API, saves coordinates
+```
+
+The frontend automatically triggers geocoding after every new order creation.
 
 ---
 
@@ -247,7 +310,10 @@ API → Application → Domain ← Infrastructure
 
 - 🔐 JWT Authentication — all endpoints protected
 - 📄 PDF Generation — download any order as a PDF invoice
+- 📊 Excel Export — export full orders table to Excel
 - 🗺️ Geocoding — Google Maps integration to geocode order addresses
 - 📍 Map Pins — customer order locations returned as lat/lng coordinates
-- 📊 Dashboard — aggregated stats (total orders, revenue, pending shipments)
+- 📈 Dashboard — aggregated stats (total orders, revenue, pending shipments)
 - 🔄 Bulk Geocoding — geocode all pending orders in one request with rate limiting
+- ✏️ Create & Update Orders — full order management with line items
+- 👥 Employee Management — title management for authorized roles
