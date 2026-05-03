@@ -1,0 +1,18 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.emp-form {
+  display:        flex;
+  flex-direction: column;
+  gap:            $spacing-md;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap:     $spacing-md;
+
+  @include mobile { grid-template-columns: 1fr; }
+
+  &--3 { grid-template-columns: 1fr 1fr 1fr; }
+}
