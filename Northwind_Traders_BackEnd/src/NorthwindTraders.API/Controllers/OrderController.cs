@@ -3,6 +3,7 @@ using NorthwindTraders.Application.DTOs.Order;
 using NorthwindTraders.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using NorthwindTraders.Infrastructure.Services;
+using ClosedXML.Excel;
 
 namespace NorthwindTraders.API.Controllers;
 
@@ -236,6 +237,78 @@ public class OrdersController : ControllerBase      // C#
             return StatusCode(500, $"An unexpected error occurred while generating the PDF for order {id}: {ex.Message}");
         }
     }
+
+    // GET api/v1/orders/export/excel
+// Exports all orders to Excel — used in the orders table toolbar
+[HttpGet("export/excel")]
+public async Task<IActionResult> ExportExcel()
+{
+    try
+    {
+        var orders = await _repository.GetAllAsync();
+
+        // XLWorkbook — ClosedXML — creates an in-memory Excel file
+        using var workbook  = new ClosedXML.Excel.XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Orders");
+
+        // ── HEADER ROW ───────────────────────────────────────────────
+        worksheet.Cell(1, 1).Value = "Order ID";
+        worksheet.Cell(1, 2).Value = "Customer";
+        worksheet.Cell(1, 3).Value = "Employee";
+        worksheet.Cell(1, 4).Value = "Order Date";
+        worksheet.Cell(1, 5).Value = "Required Date";
+        worksheet.Cell(1, 6).Value = "Shipped Date";
+        worksheet.Cell(1, 7).Value = "Ship Name";
+        worksheet.Cell(1, 8).Value = "Ship City";
+        worksheet.Cell(1, 9).Value = "Ship Country";
+        worksheet.Cell(1, 10).Value = "Freight";
+        worksheet.Cell(1, 11).Value = "Shipment Status";
+        worksheet.Cell(1, 12).Value = "Region";
+
+        // Bold header row
+        worksheet.Row(1).Style.Font.Bold = true;
+
+        // ── DATA ROWS ────────────────────────────────────────────────
+        int row = 2;
+        foreach (var o in orders)
+        {
+            worksheet.Cell(row, 1).Value  = o.OrderId;
+            worksheet.Cell(row, 2).Value  = o.Customer?.CompanyName ?? "";
+            worksheet.Cell(row, 3).Value  = o.Employee is not null
+                                              ? $"{o.Employee.FirstName} {o.Employee.LastName}"
+                                              : "";
+            worksheet.Cell(row, 4).Value  = o.OrderDate?.ToString("yyyy-MM-dd") ?? "";
+            worksheet.Cell(row, 5).Value  = o.RequiredDate?.ToString("yyyy-MM-dd") ?? "";
+            worksheet.Cell(row, 6).Value  = o.ShippedDate?.ToString("yyyy-MM-dd") ?? "";
+            worksheet.Cell(row, 7).Value  = o.ShipName ?? "";
+            worksheet.Cell(row, 8).Value  = o.ShipCity ?? "";
+            worksheet.Cell(row, 9).Value  = o.ShipCountry ?? "";
+            worksheet.Cell(row, 10).Value = o.Freight ?? 0;
+            worksheet.Cell(row, 11).Value = o.ShipmentState?.Name ?? "";
+            worksheet.Cell(row, 12).Value = o.ShipRegion ?? "";
+            row++;
+        }
+
+        // Auto-fit all columns
+        worksheet.Columns().AdjustToContents();
+
+        // Write workbook to memory stream
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        // Return as downloadable Excel file
+        return File(
+            stream.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"Orders_{DateTime.UtcNow:yyyy-MM-dd}.xlsx"
+        );
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Unexpected error while exporting orders to Excel: {ex.Message}");
+    }
+}
 
     // POST api/v1/orders/10248/geocode
     [HttpPost("{id}/geocode")]

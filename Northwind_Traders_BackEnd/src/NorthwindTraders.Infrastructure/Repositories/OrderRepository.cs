@@ -21,8 +21,11 @@ public class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.OrderId == id);    // EF Core Method
 
     public async Task<IReadOnlyList<Order>> GetAllAsync()
-        => await _context.Orders
-            .ToListAsync();                                 // EF Core Method
+    => await _context.Orders
+        .Include(o => o.Customer)
+        .Include(o => o.Employee)
+        .Include(o => o.ShipmentState)
+        .ToListAsync();                   // EF Core Method
 
     public async Task AddAsync(Order order)
         => await _context.Orders.AddAsync(order);          // EF Core Method
