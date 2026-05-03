@@ -50,7 +50,7 @@ public class GeocodingService
         if (status != "OK")
     return Result<(string, decimal, decimal)>.Failure(
         $"Geocoding failed with status: {status}");
-        
+
         // Navigate the JSON tree to get results[0]
         var results  = root.GetProperty("results");
         var first    = results[0];
@@ -145,4 +145,40 @@ public class GeocodingService
             new[] { address, city, region, postalCode, country }
             .Where(s => !string.IsNullOrWhiteSpace(s)));
     }
+
+
+    // Geocodes ALL orders that haven't been geocoded yet
+// Returns a summary: how many processed, succeeded, failed
+public async Task<(int processed, int succeeded, int failed)> GeocodeAllPendingAsync()
+{
+    // Find all orders where ShipLatitude is null AND ShipAddress exists
+    // These are orders that have never been geocoded
+    var pendingOrders = await _context.Orders
+        .Where(o => o.ShipLatitude == null
+                 && (o.ShipAddress != null || o.ShipCity != null))
+        .Select(o => o.OrderId)   // only fetch IDs — we load each one individually
+        .ToListAsync();
+
+    int succeeded = 0;
+    int failed    = 0;
+
+    foreach (var orderId in pendingOrders)
+    {
+        // Reuse the existing single-order geocoding logic
+        var result = await GeocodeOrderAsync(orderId);
+
+        if (result.IsSuccess)
+            succeeded++;
+        else
+            failed++;
+
+        // ── RATE LIMITING ─────────────────────────────────────────────────
+        // Google Maps free tier allows 50 requests/second
+        // 50ms delay keeps us safely under the limit
+        // Task.Delay — C# built in — async pause, does not block the thread
+        await Task.Delay(50);
+    }
+
+    return (pendingOrders.Count, succeeded, failed);
+}
 }

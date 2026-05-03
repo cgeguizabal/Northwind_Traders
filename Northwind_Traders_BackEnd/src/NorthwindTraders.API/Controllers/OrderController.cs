@@ -219,4 +219,20 @@ public async Task<IActionResult> Geocode(int id)
         BillLongitude        = billLng
     });
 }
+
+// POST api/v1/orders/geocode-all
+// Geocodes all orders that have no coordinates yet
+[HttpPost("geocode-all")]
+[AllowAnonymous]  
+public async Task<IActionResult> GeocodeAll()
+{
+    var (processed, succeeded, failed) = await _geocodingService.GeocodeAllPendingAsync();
+
+    return Ok(new BulkGeocodeResultDto
+    {
+        Processed = processed,
+        Succeeded = succeeded,
+        Failed    = failed
+    });
+}
 }
