@@ -3,6 +3,7 @@ using NorthwindTraders.Application.DTOs.Order;
 using NorthwindTraders.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using NorthwindTraders.Infrastructure.Services;
+using NorthwindTraders.Domain.Entities;          // ← Order, OrderDetail
 
 
 namespace NorthwindTraders.API.Controllers;
@@ -237,6 +238,120 @@ public class OrdersController : ControllerBase      // C#
             return StatusCode(500, $"An unexpected error occurred while generating the PDF for order {id}: {ex.Message}");
         }
     }
+
+// POST api/v1/orders
+[HttpPost]
+public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
+{
+    try
+    {
+        if (dto.Lines is null || dto.Lines.Count == 0)
+            return BadRequest("An order must have at least one product line.");
+
+        var order = new Order
+        {
+            CustomerId      = dto.CustomerId,
+            EmployeeId      = dto.EmployeeId,
+            ShipVia         = dto.ShipVia,
+            ShipmentStateId = dto.ShipmentStateId,
+            OrderDate       = dto.OrderDate ?? DateTime.UtcNow,
+            RequiredDate    = dto.RequiredDate,
+            ShippedDate     = dto.ShippedDate,
+            Freight         = dto.Freight,
+            Notes           = dto.Notes,
+            ShipName        = dto.ShipName,
+            ShipAddress     = dto.ShipAddress,
+            ShipCity        = dto.ShipCity,
+            ShipRegion      = dto.ShipRegion,
+            ShipPostalCode  = dto.ShipPostalCode,
+            ShipCountry     = dto.ShipCountry,
+            BillAddress     = dto.BillAddress,
+            BillCity        = dto.BillCity,
+            BillRegion      = dto.BillRegion,
+            BillPostalCode  = dto.BillPostalCode,
+            BillCountry     = dto.BillCountry,
+            OrderDetails    = dto.Lines.Select(l => new OrderDetail
+            {
+                ProductId = l.ProductId,
+                UnitPrice = l.UnitPrice,
+                Quantity  = l.Quantity,
+                Discount  = l.Discount
+            }).ToList()
+        };
+
+        await _repository.AddAsync(order);
+        await _repository.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetById), new { id = order.OrderId }, new { order.OrderId });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Unexpected error while creating order: {ex.Message}");
+    }
+}
+
+// PUT api/v1/orders/5
+[HttpPut("{id}")]
+public async Task<IActionResult> Update(int id, [FromBody] UpdateOrderDto dto)
+{
+    try
+    {
+        var order = await _repository.GetOrderWithDetailsAsync(id);
+
+        if (order is null)
+            return NotFound($"Order with id {id} was not found.");
+
+        // Only update fields that were provided
+        if (dto.CustomerId      is not null) order.CustomerId      = dto.CustomerId;
+        if (dto.EmployeeId      is not null) order.EmployeeId      = dto.EmployeeId;
+        if (dto.ShipVia         is not null) order.ShipVia         = dto.ShipVia;
+        if (dto.ShipmentStateId is not null) order.ShipmentStateId = dto.ShipmentStateId;
+        if (dto.OrderDate       is not null) order.OrderDate       = dto.OrderDate;
+        if (dto.RequiredDate    is not null) order.RequiredDate    = dto.RequiredDate;
+        if (dto.ShippedDate     is not null) order.ShippedDate     = dto.ShippedDate;
+        if (dto.Freight         is not null) order.Freight         = dto.Freight;
+        if (dto.Notes           is not null) order.Notes           = dto.Notes;
+        if (dto.ShipName        is not null) order.ShipName        = dto.ShipName;
+        if (dto.ShipAddress     is not null) order.ShipAddress     = dto.ShipAddress;
+        if (dto.ShipCity        is not null) order.ShipCity        = dto.ShipCity;
+        if (dto.ShipRegion      is not null) order.ShipRegion      = dto.ShipRegion;
+        if (dto.ShipPostalCode  is not null) order.ShipPostalCode  = dto.ShipPostalCode;
+        if (dto.ShipCountry     is not null) order.ShipCountry     = dto.ShipCountry;
+        if (dto.BillAddress     is not null) order.BillAddress     = dto.BillAddress;
+        if (dto.BillCity        is not null) order.BillCity        = dto.BillCity;
+        if (dto.BillRegion      is not null) order.BillRegion      = dto.BillRegion;
+        if (dto.BillPostalCode  is not null) order.BillPostalCode  = dto.BillPostalCode;
+        if (dto.BillCountry     is not null) order.BillCountry     = dto.BillCountry;
+
+        // Replace order lines if provided
+        if (dto.Lines is not null && dto.Lines.Count > 0)
+        {
+            order.OrderDetails.Clear();
+            foreach (var l in dto.Lines)
+            {
+                order.OrderDetails.Add(new OrderDetail
+                {
+                    OrderId   = id,
+                    ProductId = l.ProductId,
+                    UnitPrice = l.UnitPrice,
+                    Quantity  = l.Quantity,
+                    Discount  = l.Discount
+                });
+            }
+        }
+
+        _repository.Update(order);
+        await _repository.SaveChangesAsync();
+
+        return NoContent();
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Unexpected error while updating order {id}: {ex.Message}");
+    }
+}
+
+
 
     // GET api/v1/orders/export/excel
 // Exports all orders to Excel — used in the orders table toolbar
