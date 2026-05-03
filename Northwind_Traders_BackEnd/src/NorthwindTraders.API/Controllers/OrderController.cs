@@ -13,11 +13,13 @@ public class OrdersController : ControllerBase      // C#
 {
     private readonly IOrderRepository _repository;
     private readonly PdfService _pdfService;
+    private readonly GeocodingService _geocodingService; 
 
-    public OrdersController(IOrderRepository repository, PdfService pdfService)
+    public OrdersController(IOrderRepository repository, PdfService pdfService,  GeocodingService geocodingService)
 {
     _repository = repository;
     _pdfService = pdfService;
+     _geocodingService  = geocodingService; 
 }
 
     // GET api/orders
@@ -190,5 +192,31 @@ public async Task<IActionResult> GetPdf(int id)
     // application/pdf = MIME type — tells the browser what type of file this is
     // Order_{id}.pdf  = suggested filename when the browser downloads it
     return File(pdfBytes, "application/pdf", $"Order_{id}.pdf");
+}
+
+// POST api/v1/orders/10248/geocode
+[HttpPost("{id}/geocode")]
+[Authorize]   // only logged in employees can trigger geocoding
+public async Task<IActionResult> Geocode(int id)
+{
+    // GeocodingService handles finding the order and saving results
+    var result = await _geocodingService.GeocodeOrderAsync(id);
+
+    // Result<T> — check IsSuccess before reading Value
+    if (!result.IsSuccess)
+        return BadRequest(result.Error);
+
+    var (validatedShip, shipLat, shipLng, validatedBill, billLat, billLng) = result.Value!;
+
+    return Ok(new GeocodeResultDto
+    {
+        OrderId              = id,
+        ValidatedShipAddress = validatedShip,
+        ShipLatitude         = shipLat,
+        ShipLongitude        = shipLng,
+        ValidatedBillAddress = validatedBill,
+        BillLatitude         = billLat,
+        BillLongitude        = billLng
+    });
 }
 }
