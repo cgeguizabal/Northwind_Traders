@@ -1,0 +1,10 @@
+# User secrets — never commit
+**/appsettings.Development.json
+**/appsettings.Production.json
+
+# Connection strings and secrets — never commit
+**/appsettings.json
+
+# .NET build output
+**/bin/
+**/obj/

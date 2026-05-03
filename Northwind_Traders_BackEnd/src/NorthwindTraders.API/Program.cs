@@ -24,6 +24,30 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<PdfService>();
 builder.Services.AddScoped<DashboardService>();
 
+
+// ── CORS ──────────────────────────────────────────────────────────────────────
+// AddCors — C# built in ASP.NET Core Method
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        // Program.cs — reads origins from config
+         var allowedOrigins = builder.Configuration
+             .GetSection("AllowedOrigins")
+    .         Get<string[]>() ?? [];
+                policy.WithOrigins(allowedOrigins)
+
+                
+            // AllowAnyHeader — allow any HTTP header (Authorization, Content-Type, etc.)
+            .AllowAnyHeader()
+            // AllowAnyMethod — allow GET, POST, PUT, DELETE, OPTIONS, etc.
+            .AllowAnyMethod()
+            // AllowCredentials — allow cookies and Authorization headers
+            // Required so the browser sends the JWT token
+            .AllowCredentials();
+    });
+});
+
 // ── JWT AUTHENTICATION ────────────────────────────────────────────────────────
 // AddAuthentication — C# built in ASP.NET Core Method
 // Tells ASP.NET Core: "use JWT bearer tokens as the auth scheme"
