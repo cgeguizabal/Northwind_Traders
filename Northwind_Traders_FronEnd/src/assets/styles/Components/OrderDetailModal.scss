@@ -1,0 +1,43 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.detail-header { margin-bottom: $spacing-md; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap:     $spacing-lg;
+
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.detail-section-title {
+  font-size:       $font-size-base;
+  font-weight:     600;
+  color:           var(--text-muted);
+  margin-bottom:   $spacing-sm;
+  text-transform:  uppercase;
+  letter-spacing:  0.05em;
+}
+
+.detail-dl {
+  display:        flex;
+  flex-direction: column;
+  gap:            $spacing-xs;
+
+  > div { display: flex; gap: $spacing-sm; flex-wrap: wrap; }
+
+  dt {
+    color:       var(--text-muted);
+    font-size:   $font-size-sm;
+    min-width:   90px;
+    flex-shrink: 0;
+  }
+
+  dd { font-size: $font-size-sm; }
+}
+
+.table-scroll { overflow-x: auto; }
+
+.total-label { text-align: right; font-weight: 600; color: var(--text-muted); }
+.total-value { font-weight: 700; color: $color-green; }

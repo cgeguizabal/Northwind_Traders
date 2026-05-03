@@ -1,0 +1,59 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.orders-view__loading { @include flex-center; min-height: 200px; }
+
+.tabs {
+  display:        flex;
+  gap:            $spacing-xs;
+  margin-bottom:  $spacing-md;
+  border-bottom:  1px solid var(--border);
+  padding-bottom: $spacing-xs;
+}
+
+.tab {
+  padding:       $spacing-xs $spacing-lg;
+  background:    transparent;
+  border:        none;
+  cursor:        pointer;
+  color:         var(--text-muted);
+  font-size:     $font-size-base;
+  font-weight:   500;
+  border-radius: $radius-sm $radius-sm 0 0;
+  transition:    $transition-base;
+
+  &.active {
+    color:         var(--text-primary);
+    border-bottom: 2px solid $color-purple;
+  }
+
+  &:hover:not(.active) {
+    color:      var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.toolbar {
+  display:       flex;
+  gap:           $spacing-sm;
+  margin-bottom: $spacing-md;
+  flex-wrap:     wrap;
+
+  &__select { max-width: 160px; }
+}
+
+.header-actions { display: flex; gap: $spacing-sm; }
+
+.reports-actions {
+  display:       flex;
+  gap:           $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.reports-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap:     $spacing-lg;
+
+  @include mobile { grid-template-columns: 1fr; }
+}

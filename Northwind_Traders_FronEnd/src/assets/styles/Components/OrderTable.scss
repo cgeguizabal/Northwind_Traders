@@ -1,0 +1,12 @@
+@use '../variables' as *;
+
+.table-scroll {
+  overflow-x:    auto;
+  border-radius: $radius-md;
+}
+
+.table-empty {
+  text-align: center;
+  color:      var(--text-muted);
+  padding:    $spacing-xl !important;
+}
