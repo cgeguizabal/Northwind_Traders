@@ -1,0 +1,6 @@
+@use '../variables' as *;
+
+.confirm-dialog__msg {
+  color:       var(--text-primary);
+  line-height: 1.6;
+}

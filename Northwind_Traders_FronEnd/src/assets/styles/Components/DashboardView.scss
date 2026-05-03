@@ -1,0 +1,41 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.dashboard {
+  max-width: 1400px;
+
+  &__loading {
+    @include flex-center;
+    min-height: 300px;
+  }
+
+  &__filter {
+    display:       flex;
+    gap:           $spacing-md;
+    margin-bottom: $spacing-lg;
+    flex-wrap:     wrap;
+
+    .form-group { min-width: 160px; }
+  }
+
+  &__stats {
+    display:               grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap:                   $spacing-md;
+    margin-bottom:         $spacing-xl;
+  }
+
+  &__charts {
+    display:               grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap:                   $spacing-lg;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  &__error {
+    text-align: center;
+    color:      var(--text-muted);
+    padding:    $spacing-xl;
+  }
+}

@@ -1,0 +1,26 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.spinner-center { @include flex-center; min-height: 200px; }
+
+.back-btn { margin-bottom: $spacing-lg; }
+
+.customer-header {
+  @include flex-between;
+  padding:       $spacing-xl;
+  margin-bottom: $spacing-lg;
+  flex-wrap:     wrap;
+  gap:           $spacing-md;
+
+  h2 { font-size: $font-size-2xl; font-weight: 700; }
+  p  { color: var(--text-muted); font-size: $font-size-sm; margin-top: $spacing-xs; }
+}
+
+.section-title {
+  font-size:      $font-size-base;
+  font-weight:    700;
+  color:          $color-purple-light;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom:  $spacing-md;
+}

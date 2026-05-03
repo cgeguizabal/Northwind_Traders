@@ -1,0 +1,6 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.spinner-center { @include flex-center; min-height: 200px; }
+
+.search-input { max-width: 320px; }

@@ -1,0 +1,71 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.modal-backdrop {
+  position:        fixed;
+  inset:           0;
+  z-index:         $z-modal;
+  background:      rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  @include flex-center;
+  padding:         $spacing-md;
+}
+
+.modal-box {
+  width:          100%;
+  max-height:     90vh;
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+
+  // Ensure modal is always readable in both themes
+  background:    var(--bg-card);
+  border:        1px solid var(--border);
+  border-radius: $radius-lg;
+  color:         var(--text-primary);
+
+  @include mobile { max-width: 100% !important; }
+}
+
+.modal-box__header {
+  @include flex-between;
+  padding:       $spacing-lg $spacing-lg $spacing-md;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:   0;
+}
+
+.modal-box__title {
+  font-size:   $font-size-xl;
+  font-weight: 700;
+}
+
+.modal-box__close {
+  background:  transparent;
+  border:      none;
+  color:       var(--text-muted);
+  font-size:   1.2rem;
+  cursor:      pointer;
+  padding:     $spacing-xs;
+  line-height: 1;
+  transition:  color 0.2s;
+
+  &:hover { color: var(--text-primary); }
+}
+
+.modal-box__body {
+  padding:    $spacing-lg;
+  overflow-y: auto;
+  flex:       1;
+  @include custom-scrollbar;
+
+  &.no-padding { padding: 0; }
+}
+
+.modal-box__footer {
+  padding:         $spacing-md $spacing-lg;
+  border-top:      1px solid var(--border);
+  display:         flex;
+  justify-content: flex-end;
+  gap:             $spacing-sm;
+  flex-shrink:     0;
+}

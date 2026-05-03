@@ -1,0 +1,99 @@
+@use "../variables" as *;
+@use "../mixins" as *;
+
+.login-page {
+  min-height: 100vh;
+  @include flex-center;
+  background: $color-bg-dark;
+  background-image:
+    radial-gradient(
+      ellipse at 30% 40%,
+      rgba(124, 58, 237, 0.15) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 80% 80%,
+      rgba(245, 158, 11, 0.08) 0%,
+      transparent 50%
+    );
+  padding: $spacing-md;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: $spacing-2xl;
+
+  @include mobile {
+    padding: $spacing-xl $spacing-lg;
+  }
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+}
+
+.login-brand__icon {
+  width: 48px;
+  height: 48px;
+  display: block;
+  margin: 0 auto $spacing-sm;
+  color: $color-purple-light;
+}
+
+.login-brand__name {
+  font-size: $font-size-2xl;
+  font-weight: 800;
+  background: linear-gradient(135deg, $color-purple-light, $color-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-brand__sub {
+  font-size: $font-size-sm;
+  color: var(--text-muted);
+  margin-top: $spacing-xs;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.password-wrapper {
+  position: relative;
+
+  .form-control {
+    padding-right: 40px;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: $spacing-sm;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.login-submit {
+  width: 100%;
+  justify-content: center;
+  padding: $spacing-md;
+  margin-top: $spacing-xs;
+  font-size: $font-size-lg;
+}

@@ -1,0 +1,31 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.spinner {
+  @include flex-center;
+
+  &--sm  { width: 24px; height: 24px; }
+  &--md  { width: 48px; height: 48px; }
+  &--lg  { width: 72px; height: 72px; }
+
+  &--page {
+    position:   fixed;
+    inset:      0;
+    @include flex-center;
+    background: rgba(0, 0, 0, 0.3);
+    z-index:    $z-modal - 1;
+  }
+}
+
+.spinner__ring {
+  width:            100%;
+  height:           100%;
+  border:           3px solid rgba(124, 58, 237, 0.2);
+  border-top-color: $color-purple;
+  border-radius:    50%;
+  animation:        spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
