@@ -34,7 +34,14 @@ export const useAuthStore = defineStore("auth", () => {
   // Decode stored token on store init if it exists
   if (token.value) {
     try {
-      user.value = jwtDecode(token.value);
+      const decoded = jwtDecode(token.value);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        // Token expired — clear it
+        token.value = null;
+        localStorage.removeItem("nt_token");
+      } else {
+        user.value = decoded;
+      }
     } catch {
       token.value = null;
       localStorage.removeItem("nt_token");
@@ -44,9 +51,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = computed(() => !!token.value);
 
   // Display name – uses correct JWT claim key
-  const displayName = computed(
-    () => getClaimName(user.value) || "Employee",
-  );
+  const displayName = computed(() => getClaimName(user.value) || "Employee");
 
   // isManager: only Vice President, Sales or Sales Manager can access /employees
   const isManager = computed(() => {
