@@ -20,7 +20,14 @@ public class DashboardController : ControllerBase
     [Authorize]    // only logged in employees can see the dashboard
     public async Task<IActionResult> GetDashboard()
     {
-        var dashboard = await _dashboardService.GetDashboardAsync();
-        return Ok(dashboard);
+        try
+        {
+            var dashboard = await _dashboardService.GetDashboardAsync();
+            return Ok(dashboard);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error occurred while loading the dashboard: {ex.Message}");
+        }
     }
 }

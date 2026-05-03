@@ -15,6 +15,8 @@ public class DashboardService
 
     public async Task<DashboardDto> GetDashboardAsync()
     {
+        try
+        {
         // ── TOTAL ORDERS ──────────────────────────────────────────────────────
         // CountAsync — EF Core Method — SELECT COUNT(*) FROM Orders
         var totalOrders = await _context.Orders.CountAsync();
@@ -76,5 +78,22 @@ public class DashboardService
             TopCustomers   = topCustomers,
             TopEmployees   = topEmployees
         };
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+        {
+            throw new InvalidOperationException($"Database error while loading dashboard data: {ex.InnerException?.Message ?? ex.Message}", ex);
+        }
+        catch (OperationCanceledException ex)
+        {
+            throw new InvalidOperationException($"Dashboard data query was cancelled: {ex.Message}", ex);
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new InvalidOperationException($"Invalid operation while loading dashboard data: {ex.Message}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to load dashboard data: {ex.Message}", ex);
+        }
     }
 }

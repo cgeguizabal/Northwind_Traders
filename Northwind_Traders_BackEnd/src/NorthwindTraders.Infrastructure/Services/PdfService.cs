@@ -10,10 +10,12 @@ public class PdfService
     // Returns the PDF as byte[] — raw binary of the file in memory
     public byte[] GenerateOrderPdf(OrderDetailDto order)
     {
-        // QuestPDF requires a license declaration — Community is free
-        QuestPDF.Settings.License = LicenseType.Community;
+        try
+        {
+            // QuestPDF requires a license declaration — Community is free
+            QuestPDF.Settings.License = LicenseType.Community;
 
-        return Document.Create(container =>
+            return Document.Create(container =>
         {
             container.Page(page =>
             {
@@ -199,5 +201,18 @@ public class PdfService
             });
         })
         .GeneratePdf();    // QuestPDF Method — returns byte[]
+        }
+        catch (ArgumentNullException ex)
+        {
+            throw new InvalidOperationException($"A required value was null while generating the PDF: {ex.Message}", ex);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new InvalidOperationException($"Invalid argument while generating the PDF: {ex.Message}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to generate PDF document: {ex.Message}", ex);
+        }
     }
 }
