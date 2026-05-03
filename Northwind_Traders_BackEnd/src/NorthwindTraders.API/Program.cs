@@ -18,6 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>(); 
 
 // ── SERVICES ──────────────────────────────────────────────────────────────────
 // AddScoped — JwtService needs IConfiguration which is a singleton, scoped is fine here
@@ -25,6 +26,7 @@ builder.Services.AddHttpClient<GeocodingService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<PdfService>();
 builder.Services.AddScoped<DashboardService>();
+
 
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
