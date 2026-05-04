@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;       // JWT package — SymmetricSecurity
 using NorthwindTraders.Domain.Entities;
 using NorthwindTraders.Application.Interfaces; 
 
+
 namespace NorthwindTraders.Infrastructure.Services;
 
 public class JwtService : IJwtService  
