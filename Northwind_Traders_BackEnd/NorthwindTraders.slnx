@@ -5,4 +5,7 @@
     <Project Path="src/NorthwindTraders.Domain/NorthwindTraders.Domain.csproj" />
     <Project Path="src/NorthwindTraders.Infrastructure/NorthwindTraders.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Test/">
+    <Project Path="Test/NorthwindTraders.Tests/NorthwindTraders.Tests.csproj" />
+  </Folder>
 </Solution>
