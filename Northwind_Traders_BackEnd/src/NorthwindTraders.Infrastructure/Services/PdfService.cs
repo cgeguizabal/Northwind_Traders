@@ -2,10 +2,12 @@ using QuestPDF.Fluent;          // QuestPDF — Document, Column, Row, Table, et
 using QuestPDF.Helpers;         // QuestPDF — Colors, PageSizes
 using QuestPDF.Infrastructure;  // QuestPDF — IDocument, LicenseType
 using NorthwindTraders.Application.DTOs.Order;
+using NorthwindTraders.Application.Interfaces;
+
 
 namespace NorthwindTraders.Infrastructure.Services;
 
-public class PdfService
+public class PdfService : IPdfService
 {
     // Returns the PDF as byte[] — raw binary of the file in memory
     public byte[] GenerateOrderPdf(OrderDetailDto order)

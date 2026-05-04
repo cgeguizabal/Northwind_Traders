@@ -1,32 +1,44 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using NorthwindTraders.API.Controllers;
 using NorthwindTraders.Domain.Entities;
 using NorthwindTraders.Domain.Interfaces;
 using NorthwindTraders.Infrastructure.Services;
 using Xunit;
+using NorthwindTraders.Application.Interfaces; 
 
 namespace NorthwindTraders.Tests.Controllers;
 
 public class OrdersControllerTests
 {
-    // ── Helpers: build a controller with mocked dependencies ──────
+    // ── Build controller with mocked repo ─────────────────────────
+    // PdfService has no constructor args → instantiate directly
+    // GeocodingService needs HttpClient+Config+DbContext → we never
+    // call geocode endpoints in these tests so we pass null via
+    // a simple subclass trick OR use the real constructor minimally.
+    // Cleanest: extract helpers that only need the repo mock.
+
     private static OrdersController BuildController(
-        Mock<IOrderRepository>? repoMock = null)
+        Mock<IOrderRepository> repoMock)
     {
-        repoMock        ??= new Mock<IOrderRepository>();
-        var pdfMock       = new Mock<PdfService>();
-        var geocodeMock   = new Mock<GeocodingService>();
+        var pdfService = new PdfService();  // no dependencies — safe to instantiate
+
+        // GeocodingService needs real deps we don't have in tests.
+        // Since none of our tests call geocode endpoints, we pass null!
+        // The controller only uses _geocodingService in geocode actions.
+        // We cast to bypass the compiler null warning.
+        var geocodingService = (GeocodingService)null!;
 
         return new OrdersController(
             repoMock.Object,
-            pdfMock.Object,
-            geocodeMock.Object);
+            pdfService,
+            geocodingService);
     }
 
     // ─────────────────────────────────────────────────────────────
     // GET /api/v1/orders
-    // ───────────────────────────────��─────────────────────────────
+    // ─────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task GetAll_ReturnsOk_WithOrderList()
@@ -34,8 +46,8 @@ public class OrdersControllerTests
         // ARRANGE
         var orders = new List<Order>
         {
-            new Order { OrderId = 1, CustomerId = "ALFKI" },
-            new Order { OrderId = 2, CustomerId = "WOLZA" }
+            new() { OrderId = 1, CustomerId = "ALFKI" },
+            new() { OrderId = 2, CustomerId = "WOLZA" }
         };
 
         var repoMock = new Mock<IOrderRepository>();
@@ -53,7 +65,7 @@ public class OrdersControllerTests
     }
 
     [Fact]
-    public async Task GetAll_ReturnsEmpty_WhenNoOrders()
+    public async Task GetAll_ReturnsOk_WhenNoOrders()
     {
         // ARRANGE
         var repoMock = new Mock<IOrderRepository>();
@@ -80,8 +92,8 @@ public class OrdersControllerTests
         // ARRANGE
         var order = new Order
         {
-            OrderId    = 10248,
-            CustomerId = "VINET",
+            OrderId      = 10248,
+            CustomerId   = "VINET",
             OrderDetails = new List<OrderDetail>()
         };
 
@@ -105,7 +117,7 @@ public class OrdersControllerTests
         // ARRANGE
         var repoMock = new Mock<IOrderRepository>();
         repoMock.Setup(r => r.GetOrderWithDetailsAsync(999))
-                .ReturnsAsync((Order?)null);   // simulate not found
+                .ReturnsAsync((Order?)null);
 
         var controller = BuildController(repoMock);
 
@@ -137,7 +149,7 @@ public class OrdersControllerTests
 
         // ASSERT
         Assert.IsType<NoContentResult>(result);
-        Assert.Equal(3, order.ShipmentStateId); // verify it was actually updated
+        Assert.Equal(3, order.ShipmentStateId); // verify it was mutated
     }
 
     [Fact]
@@ -145,7 +157,8 @@ public class OrdersControllerTests
     {
         // ARRANGE
         var repoMock = new Mock<IOrderRepository>();
-        repoMock.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((Order?)null);
+        repoMock.Setup(r => r.GetByIdAsync(999))
+                .ReturnsAsync((Order?)null);
 
         var controller = BuildController(repoMock);
 
@@ -154,5 +167,27 @@ public class OrdersControllerTests
 
         // ASSERT
         Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GET /api/v1/orders — 500 error path
+    // ─────────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetAll_Returns500_WhenRepositoryThrows()
+    {
+        // ARRANGE
+        var repoMock = new Mock<IOrderRepository>();
+        repoMock.Setup(r => r.GetAllAsync())
+                .ThrowsAsync(new Exception("DB connection lost"));
+
+        var controller = BuildController(repoMock);
+
+        // ACT
+        var result = await controller.GetAll();
+
+        // ASSERT
+        var status = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, status.StatusCode);
     }
 }

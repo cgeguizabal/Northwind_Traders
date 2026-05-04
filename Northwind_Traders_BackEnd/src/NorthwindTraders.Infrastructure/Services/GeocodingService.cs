@@ -3,10 +3,11 @@ using Microsoft.Extensions.Configuration;
 using NorthwindTraders.Domain.Common;             // Result<T>
 using NorthwindTraders.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using NorthwindTraders.Domain.Interfaces;       // IGeocodingService
 
 namespace NorthwindTraders.Infrastructure.Services;
 
-public class GeocodingService
+public class GeocodingService : IGeocodingService 
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
