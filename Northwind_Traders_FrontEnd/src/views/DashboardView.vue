@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
@@ -13,13 +13,28 @@ const store = useDashboardStore();
 const router = useRouter();
 const toast = useToast();
 
-// Date range filter state (visual only — API returns pre-aggregated data)
+// Date range filter state
 const dateFrom = ref("");
 const dateTo = ref("");
+
+function buildParams() {
+  const p = {};
+  if (dateFrom.value) p.dateFrom = dateFrom.value;
+  if (dateTo.value) p.dateTo = dateTo.value;
+  return p;
+}
 
 onMounted(async () => {
   try {
     await store.fetchStats();
+  } catch {
+    toast.error("Failed to load dashboard data.");
+  }
+});
+
+watch([dateFrom, dateTo], async () => {
+  try {
+    await store.fetchStats(buildParams());
   } catch {
     toast.error("Failed to load dashboard data.");
   }

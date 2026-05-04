@@ -13,18 +13,25 @@ public class DashboardService
         _context = context;
     }
 
-    public async Task<DashboardDto> GetDashboardAsync()
+    public async Task<DashboardDto> GetDashboardAsync(DateTime? dateFrom = null, DateTime? dateTo = null)
     {
         try
         {
+        // Normalize dateTo to end-of-day so the upper bound is inclusive
+        var toInclusive = dateTo.HasValue ? dateTo.Value.Date.AddDays(1) : (DateTime?)null;
+
         // ── TOTAL ORDERS ──────────────────────────────────────────────────────
         // CountAsync — EF Core Method — SELECT COUNT(*) FROM Orders
-        var totalOrders = await _context.Orders.CountAsync();
+        var ordersQuery = _context.Orders.AsQueryable();
+        if (dateFrom.HasValue)   ordersQuery = ordersQuery.Where(o => o.OrderDate >= dateFrom.Value.Date);
+        if (toInclusive.HasValue) ordersQuery = ordersQuery.Where(o => o.OrderDate < toInclusive.Value);
+        var totalOrders = await ordersQuery.CountAsync();
 
         // ── TOTAL REVENUE ─────────────────────────────────────────────────────
-        // Sum across all OrderDetails: UnitPrice * Quantity * (1 - Discount)
-        // C# cast to decimal needed because Discount is float
-        var totalRevenue = await _context.OrderDetails
+        var detailsQuery = _context.OrderDetails.AsQueryable();
+        if (dateFrom.HasValue)   detailsQuery = detailsQuery.Where(od => od.Order!.OrderDate >= dateFrom.Value.Date);
+        if (toInclusive.HasValue) detailsQuery = detailsQuery.Where(od => od.Order!.OrderDate < toInclusive.Value);
+        var totalRevenue = await detailsQuery
             .SumAsync(od => od.UnitPrice * od.Quantity * (decimal)(1 - od.Discount));
         // ── TOTAL CUSTOMERS ───────────────────────────────────────────────────────────────────
         var totalCustomers = await _context.Customers.CountAsync();
@@ -32,33 +39,32 @@ public class DashboardService
         // ── TOTAL EMPLOYEES ───────────────────────────────────────────────────────────────────
         var totalEmployees = await _context.Employees.CountAsync();
         // ── ORDERS BY STATUS ──────────────────────────────────────────────────
-        // GroupBy — EF Core translates to SQL GROUP BY
-        var ordersByStatus = await _context.Orders
-            .Where(o => o.ShipmentState != null)          // exclude orders with no status
-            .GroupBy(o => o.ShipmentState!.Name)          // GROUP BY ShipmentState.Name
+        var ordersByStatus = await ordersQuery
+            .Where(o => o.ShipmentState != null)
+            .GroupBy(o => o.ShipmentState!.Name)
             .Select(g => new OrdersByStatusDto
             {
-                Status = g.Key,                           // the group key = status name
-                Count  = g.Count()                        // COUNT(*) per group
+                Status = g.Key,
+                Count  = g.Count()
             })
             .ToListAsync();
 
         // ── TOP 5 CUSTOMERS ───────────────────────────────────────────────────
-        var topCustomers = await _context.Orders
+        var topCustomers = await ordersQuery
             .Where(o => o.Customer != null)
-            .GroupBy(o => new { o.CustomerId, o.Customer!.CompanyName })  // GROUP BY CustomerId, CompanyName
+            .GroupBy(o => new { o.CustomerId, o.Customer!.CompanyName })
             .Select(g => new TopCustomerDto
             {
                 CustomerId  = g.Key.CustomerId!,
                 CompanyName = g.Key.CompanyName,
                 OrderCount  = g.Count()
             })
-            .OrderByDescending(x => x.OrderCount)         // most orders first
-            .Take(5)                                       // TOP 5
+            .OrderByDescending(x => x.OrderCount)
+            .Take(5)
             .ToListAsync();
 
         // ── TOP 5 EMPLOYEES ───────────────────────────────────────────────────
-        var topEmployees = await _context.Orders
+        var topEmployees = await ordersQuery
             .Where(o => o.Employee != null)
             .GroupBy(o => new
             {

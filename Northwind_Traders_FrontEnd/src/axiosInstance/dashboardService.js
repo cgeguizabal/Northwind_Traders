@@ -1,3 +1,3 @@
-import api from './index.js'
+import api from "./index.js";
 
-export const getDashboardStats = () => api.get('/dashboard')
+export const getDashboardStats = (params) => api.get("/dashboard", { params });
