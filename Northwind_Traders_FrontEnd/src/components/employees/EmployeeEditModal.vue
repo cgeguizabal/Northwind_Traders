@@ -36,7 +36,16 @@ const form = reactive({
   photoPath: props.employee.photoPath || "",
 });
 
+function validate() {
+  if (!form.title) {
+    toast.error("Title is required.");
+    return false;
+  }
+  return true;
+}
+
 async function save() {
+  if (!validate()) return;
   saving.value = true;
   try {
     await store.submitUpdateEmployee(props.employee.employeeId, form);
