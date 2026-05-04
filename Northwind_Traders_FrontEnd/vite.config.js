@@ -22,4 +22,9 @@ export default defineConfig({
       },
     },
   },
+  // ── Vitest configuration ──────────────────────────────────────
+  test: {
+    environment: "jsdom", // simulates a browser DOM in Node
+    globals: true, // lets you use describe/it/expect without importing
+  },
 });
