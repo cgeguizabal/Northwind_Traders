@@ -148,5 +148,5 @@ views → stores → axiosInstance/services → API
 
 ## Documentation
 
-- 📖 [Backend README](./Northwind_Traders_BackEnd/READEME.md)
-- 📖 [Frontend README](./Northwind_Traders_FronEnd/README.md)
+- 📖 [Backend README](./Northwind_Traders_BackEnd)
+- 📖 [Frontend README](./Northwind_Traders_FrontEnd)
