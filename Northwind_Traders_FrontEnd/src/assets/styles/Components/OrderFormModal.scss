@@ -1,5 +1,5 @@
-@use '../variables' as *;
-@use '../mixins' as *;
+@use "../variables" as *;
+@use "../mixins" as *;
 
 .form-loading {
   @include flex-center;
@@ -7,40 +7,73 @@
 }
 
 .order-form {
-  display:        flex;
+  display: flex;
   flex-direction: column;
-  gap:            $spacing-md;
+  gap: $spacing-md;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap:     $spacing-md;
+  gap: $spacing-md;
 
-  @include mobile { grid-template-columns: 1fr; }
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
 
-  &--3 { grid-template-columns: 1fr 1fr 1fr; }
-  &--4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  &--3 {
+    grid-template-columns: 1fr 1fr 1fr;
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &--4 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    @include mobile {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }
 
 .line-add-row {
   grid-template-columns: 2fr 1fr 1fr 1fr auto;
   align-items: end;
+
+  @include mobile {
+    grid-template-columns: 1fr 1fr;
+
+    .form-group--btn {
+      grid-column: 1 / -1;
+    }
+  }
 }
 
-.form-group--btn { display: flex; flex-direction: column; }
+.form-group--btn {
+  display: flex;
+  flex-direction: column;
+}
 
 .section-title {
-  font-size:       $font-size-sm;
-  font-weight:     700;
-  color:           $color-purple-light;
-  text-transform:  uppercase;
-  letter-spacing:  0.06em;
-  padding-bottom:  $spacing-xs;
-  border-bottom:   1px solid var(--border);
+  font-size: $font-size-sm;
+  font-weight: 700;
+  color: $color-purple-light;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: $spacing-xs;
+  border-bottom: 1px solid var(--border);
 }
 
-.table-scroll { overflow-x: auto; }
+.table-scroll {
+  overflow-x: auto;
+}
 
-.total-label { text-align: right; font-weight: 600; color: var(--text-muted); }
-.total-value { font-weight: 700; color: $color-green; }
+.total-label {
+  text-align: right;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.total-value {
+  font-weight: 700;
+  color: $color-green;
+}

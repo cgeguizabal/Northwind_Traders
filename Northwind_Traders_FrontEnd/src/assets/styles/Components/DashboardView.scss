@@ -1,8 +1,9 @@
-@use '../variables' as *;
-@use '../mixins' as *;
+@use "../variables" as *;
+@use "../mixins" as *;
 
 .dashboard {
   max-width: 1400px;
+  width: 100%;
 
   &__loading {
     @include flex-center;
@@ -10,32 +11,36 @@
   }
 
   &__filter {
-    display:       flex;
-    gap:           $spacing-md;
+    display: flex;
+    gap: $spacing-md;
     margin-bottom: $spacing-lg;
-    flex-wrap:     wrap;
+    flex-wrap: wrap;
 
-    .form-group { min-width: 160px; }
+    .form-group {
+      min-width: 160px;
+    }
   }
 
   &__stats {
-    display:               grid;
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap:                   $spacing-md;
-    margin-bottom:         $spacing-xl;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
   }
 
   &__charts {
-    display:               grid;
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap:                   $spacing-lg;
+    gap: $spacing-lg;
 
-    @include mobile { grid-template-columns: 1fr; }
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__error {
     text-align: center;
-    color:      var(--text-muted);
-    padding:    $spacing-xl;
+    color: var(--text-muted);
+    padding: $spacing-xl;
   }
 }

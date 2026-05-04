@@ -1,51 +1,65 @@
-@use '../variables' as *;
-@use '../mixins' as *;
+@use "../variables" as *;
+@use "../mixins" as *;
 
 .app-header {
   @include flex-between;
-  position:        sticky;
-  top:             0;
-  z-index:         $z-header;
-  height:          64px;
-  padding:         0 $spacing-lg;
-  background:      rgba($color-bg-dark, 0.85);
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+  height: 64px;
+  padding: 0 $spacing-lg;
+  background: rgba($color-bg-dark, 0.85);
   backdrop-filter: blur(10px);
-  border-bottom:   1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 html.light .app-header {
-  background:    rgba(248, 247, 255, 0.9);
+  background: rgba(248, 247, 255, 0.9);
   border-bottom: 1px solid rgba(0, 0, 0, 0.07);
 }
 
 .app-header__hamburger {
-  display:        flex;
+  display: flex;
   flex-direction: column;
-  gap:            5px;
-  background:     transparent;
-  border:         none;
-  cursor:         pointer;
-  padding:        $spacing-xs;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: $spacing-xs;
 
   span {
-    display:       block;
-    width:         22px;
-    height:        2px;
-    background:    var(--text-primary);
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-primary);
     border-radius: 2px;
-    transition:    $transition-base;
+    transition: $transition-base;
   }
 }
 
 .app-header__title {
-  font-size:   $font-size-xl;
+  font-size: $font-size-xl;
   font-weight: 700;
-  color:       var(--text-primary);
+  color: var(--text-primary);
 }
 
-.app-header__right    { display: flex; align-items: center; gap: $spacing-md; }
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
 
 .app-header__greeting {
   font-size: $font-size-sm;
-  color:     var(--text-muted);
+  color: var(--text-muted);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.app-header__title {
+  @include mobile {
+    font-size: $font-size-base;
+  }
 }

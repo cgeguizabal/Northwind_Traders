@@ -235,6 +235,11 @@ html.light .data-table {
 .page-container {
   padding: $spacing-lg;
   max-width: 1400px;
+  width: 100%;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
 }
 
 .page-header {
