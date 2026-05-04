@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NorthwindTraders.Infrastructure.Services;
+using NorthwindTraders.Application.Interfaces; 
+
 
 namespace NorthwindTraders.API.Controllers;
 
@@ -9,9 +11,9 @@ namespace NorthwindTraders.API.Controllers;
 [Authorize] 
 public class DashboardController : ControllerBase
 {
-    private readonly DashboardService _dashboardService;
+    private readonly IDashboardService  _dashboardService;
 
-    public DashboardController(DashboardService dashboardService)
+    public DashboardController(IDashboardService dashboardService)
     {
         _dashboardService = dashboardService;
     }

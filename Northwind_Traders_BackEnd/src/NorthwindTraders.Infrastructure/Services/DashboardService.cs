@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;                     // EF Core — ToListAsync, SumAsync
 using NorthwindTraders.Application.DTOs.Dashboard;
 using NorthwindTraders.Infrastructure.Persistence;
+using NorthwindTraders.Application.Interfaces; 
 
 namespace NorthwindTraders.Infrastructure.Services;
 
-public class DashboardService
+public class DashboardService 
 {
     private readonly ApplicationDbContext _context;
 

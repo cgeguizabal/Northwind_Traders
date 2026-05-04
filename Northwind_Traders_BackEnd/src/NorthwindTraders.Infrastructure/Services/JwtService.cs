@@ -4,10 +4,11 @@ using System.Text;                          // C# built in — Encoding
 using Microsoft.Extensions.Configuration;  // C# built in — IConfiguration
 using Microsoft.IdentityModel.Tokens;       // JWT package — SymmetricSecurityKey, SigningCredentials
 using NorthwindTraders.Domain.Entities;
+using NorthwindTraders.Application.Interfaces; 
 
 namespace NorthwindTraders.Infrastructure.Services;
 
-public class JwtService
+public class JwtService : IJwtService  
 {
     private readonly IConfiguration _configuration;
 

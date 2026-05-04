@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;                      // C#
 using NorthwindTraders.Application.DTOs.Auth;
 using NorthwindTraders.Domain.Interfaces;
 using NorthwindTraders.Infrastructure.Services;
+using NorthwindTraders.Application.Interfaces;
 
 namespace NorthwindTraders.API.Controllers;
 
@@ -11,9 +12,9 @@ namespace NorthwindTraders.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IEmployeeRepository _employeeRepository;
-    private readonly JwtService _jwtService;
+    private readonly IJwtService _jwtService;
 
-    public AuthController(IEmployeeRepository employeeRepository, JwtService jwtService)
+public AuthController(IEmployeeRepository employeeRepository, IJwtService jwtService)
     {
         _employeeRepository = employeeRepository;
         _jwtService         = jwtService;

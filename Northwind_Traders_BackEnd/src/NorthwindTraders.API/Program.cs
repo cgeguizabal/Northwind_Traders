@@ -28,7 +28,7 @@ builder.Services.AddScoped<IShipmentStateRepository, ShipmentStateRepository>();
 // ── SERVICES ──────────────────────────────────────────────────────────────────
 // AddScoped — JwtService needs IConfiguration which is a singleton, scoped is fine here
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
-builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<DashboardService>();
 
