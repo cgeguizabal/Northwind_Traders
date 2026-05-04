@@ -16,14 +16,14 @@ public class DashboardController : ControllerBase
         _dashboardService = dashboardService;
     }
 
-    // GET api/v1/dashboard
+    // GET api/v1/dashboard?dateFrom=2024-01-01&dateTo=2024-12-31
     [HttpGet]
        // only logged in employees can see the dashboard
-    public async Task<IActionResult> GetDashboard()
+    public async Task<IActionResult> GetDashboard([FromQuery] DateTime? dateFrom, [FromQuery] DateTime? dateTo)
     {
         try
         {
-            var dashboard = await _dashboardService.GetDashboardAsync();
+            var dashboard = await _dashboardService.GetDashboardAsync(dateFrom, dateTo);
             return Ok(dashboard);
         }
         catch (Exception ex)
