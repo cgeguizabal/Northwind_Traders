@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;                      // C#
 using NorthwindTraders.Application.DTOs.Order;
 using NorthwindTraders.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using NorthwindTraders.Infrastructure.Services;
 using NorthwindTraders.Domain.Entities;        
 using NorthwindTraders.Application.Interfaces;
 
@@ -15,10 +14,10 @@ namespace NorthwindTraders.API.Controllers;
 public class OrdersController : ControllerBase      // C#
 {
     private readonly IOrderRepository _repository;
-    private readonly PdfService _pdfService;
-    private readonly GeocodingService _geocodingService; 
+    private readonly IPdfService _pdfService;
+    private readonly IGeocodingService _geocodingService;
 
-    public OrdersController(IOrderRepository repository, PdfService pdfService,  GeocodingService geocodingService)
+    public OrdersController(IOrderRepository repository, IPdfService pdfService, IGeocodingService geocodingService)
 {
     _repository = repository;
     _pdfService = pdfService;
