@@ -41,7 +41,11 @@ async function submit() {
   loading.value = true;
   try {
     await auth.loginUser({ email: form.email, password: form.password });
-    router.push("/dashboard");
+    if (auth.mustChangePassword) {
+      router.push("/change-password");
+    } else {
+      router.push("/dashboard");
+    }
   } catch {
     toast.error("Invalid email or password.");
   } finally {

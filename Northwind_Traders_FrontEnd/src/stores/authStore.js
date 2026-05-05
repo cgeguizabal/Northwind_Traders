@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { jwtDecode } from "jwt-decode";
-import { login as loginApi } from "../axiosInstance/authService.js";
+import {
+  login as loginApi,
+  changePassword as changePasswordApi,
+} from "../axiosInstance/authService.js";
 import { getEmployeeById } from "../axiosInstance/employeeService.js";
 
 // .NET JWT serialises ClaimTypes.Name → "unique_name"
@@ -30,6 +33,9 @@ export const useAuthStore = defineStore("auth", () => {
   const token = ref(localStorage.getItem("nt_token") || null);
   const user = ref(null);
   const employeeTitle = ref(localStorage.getItem("nt_emp_title") || "");
+  const mustChangePassword = ref(
+    localStorage.getItem("nt_must_change_pwd") === "true",
+  );
 
   // Decode stored token on store init if it exists
   if (token.value) {
@@ -61,11 +67,14 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function loginUser(credentials) {
     const response = await loginApi(credentials);
-    const { token: jwt } = response.data;
+    const { token: jwt, mustChangePassword: mustChange } = response.data;
     token.value = jwt;
     localStorage.setItem("nt_token", jwt);
     const decoded = jwtDecode(jwt);
     user.value = decoded;
+
+    mustChangePassword.value = !!mustChange;
+    localStorage.setItem("nt_must_change_pwd", mustChange ? "true" : "false");
 
     // Fetch employee to get title (needed for role-based access control)
     try {
@@ -84,8 +93,16 @@ export const useAuthStore = defineStore("auth", () => {
     token.value = null;
     user.value = null;
     employeeTitle.value = "";
+    mustChangePassword.value = false;
     localStorage.removeItem("nt_token");
     localStorage.removeItem("nt_emp_title");
+    localStorage.removeItem("nt_must_change_pwd");
+  }
+
+  async function changePasswordFn(newPassword, confirmPassword) {
+    await changePasswordApi({ newPassword, confirmPassword });
+    mustChangePassword.value = false;
+    localStorage.setItem("nt_must_change_pwd", "false");
   }
 
   return {
@@ -94,7 +111,9 @@ export const useAuthStore = defineStore("auth", () => {
     displayName,
     isAuthenticated,
     isManager,
+    mustChangePassword,
     loginUser,
     logout,
+    changePasswordFn,
   };
 });
