@@ -30,7 +30,7 @@ builder.Services.AddScoped<IShipmentStateRepository, ShipmentStateRepository>();
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
-builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
 

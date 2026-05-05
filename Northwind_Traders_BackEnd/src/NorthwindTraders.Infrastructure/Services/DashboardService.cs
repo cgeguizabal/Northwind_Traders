@@ -5,7 +5,7 @@ using NorthwindTraders.Application.Interfaces;
 
 namespace NorthwindTraders.Infrastructure.Services;
 
-public class DashboardService 
+public class DashboardService : IDashboardService
 {
     private readonly ApplicationDbContext _context;
 
