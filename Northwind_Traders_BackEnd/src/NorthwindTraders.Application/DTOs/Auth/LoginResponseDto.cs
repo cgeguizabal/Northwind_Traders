@@ -10,4 +10,5 @@ public class LoginResponseDto
     public string Email { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public DateTime ExpiresAt { get; set; }
+    public bool MustChangePassword { get; set; }
 }

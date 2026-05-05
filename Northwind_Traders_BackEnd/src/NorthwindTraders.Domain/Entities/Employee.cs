@@ -50,6 +50,9 @@ public class Employee
     /// Hashed password (optional, for internal auth).
     public string? PasswordHash { get; set; }
 
+    /// When true, employee must change password on next login.
+    public bool MustChangePassword { get; set; } = false;
+
     /// Manager (self-reference navigation).
     public Employee? Manager { get; set; }
 

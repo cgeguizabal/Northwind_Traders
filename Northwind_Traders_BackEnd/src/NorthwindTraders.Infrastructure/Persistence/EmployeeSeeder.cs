@@ -34,13 +34,10 @@ public static class EmployeeSeeder
             // Only seed if not already seeded
             if (employee.Email is not null) continue;
 
-            employee.Email = entry.Value;
-
-            // BCrypt.HashPassword — BCrypt.Net-Next package Method
-            // Hashes the password with a salt automatically
-            // "Northwind2025!" = default password all employees get
-            // They will change it after first login (Step 7)
+            employee.Email        = entry.Value;
             employee.PasswordHash = BCrypt.Net.BCrypt.HashPassword("Northwind2025!");
+            // Force password change on first login
+            employee.MustChangePassword = true;
         }
 
         await context.SaveChangesAsync();   // EF Core Method
