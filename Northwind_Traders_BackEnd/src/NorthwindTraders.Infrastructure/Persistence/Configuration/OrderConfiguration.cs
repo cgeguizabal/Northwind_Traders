@@ -19,22 +19,22 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                .HasColumnType("money");             // maps to SQL money type
 
         builder.Property(o => o.ShipName)
-               .HasMaxLength(40);
+               .HasMaxLength(100);
 
         builder.Property(o => o.ShipAddress)
-               .HasMaxLength(60);
+               .HasMaxLength(150);
 
         builder.Property(o => o.ShipCity)
-               .HasMaxLength(15);
+               .HasMaxLength(50);
 
         builder.Property(o => o.ShipRegion)
-               .HasMaxLength(15);
+               .HasMaxLength(50);
 
         builder.Property(o => o.ShipPostalCode)
-               .HasMaxLength(10);
+               .HasMaxLength(20);
 
         builder.Property(o => o.ShipCountry)
-               .HasMaxLength(15);
+               .HasMaxLength(50);
 
         // ── NEW ADDRESS VALIDATION COLUMNS ────────────────
         builder.Property(o => o.OriginalShipAddress)
@@ -51,19 +51,19 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         // ── NEW BILLING ADDRESS COLUMNS ───────────────────
         builder.Property(o => o.BillAddress)
-               .HasMaxLength(60);
+               .HasMaxLength(150);
 
         builder.Property(o => o.BillCity)
-               .HasMaxLength(15);
+               .HasMaxLength(50);
 
         builder.Property(o => o.BillRegion)
-               .HasMaxLength(15);
+               .HasMaxLength(50);
 
         builder.Property(o => o.BillPostalCode)
-               .HasMaxLength(10);
+               .HasMaxLength(20);
 
         builder.Property(o => o.BillCountry)
-               .HasMaxLength(15);
+               .HasMaxLength(50);
 
         builder.Property(o => o.OriginalBillAddress)
                .HasMaxLength(500);
