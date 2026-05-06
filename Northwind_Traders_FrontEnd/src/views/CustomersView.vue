@@ -47,44 +47,71 @@ const filtered = computed(() => {
         <AppSpinner size="lg" />
       </div>
 
-      <div v-else class="table-scroll glass" style="padding: 0">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Company Name</th>
-              <th>Contact</th>
-              <th>City</th>
-              <th>Country</th>
-              <th>Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="c in filtered"
-              :key="c.customerId"
-              @click="router.push(`/customers/${c.customerId}`)"
-            >
-              <td>{{ c.companyName }}</td>
-              <td>{{ c.contactName }}</td>
-              <td>{{ c.city }}</td>
-              <td>{{ c.country }}</td>
-              <td>{{ c.phone }}</td>
-            </tr>
-            <tr v-if="!filtered.length">
-              <td
-                colspan="5"
-                style="
-                  text-align: center;
-                  padding: 32px;
-                  color: var(--text-muted);
-                "
+      <template v-else>
+        <!-- Desktop: table -->
+        <div class="table-scroll glass customers-table" style="padding: 0">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Company Name</th>
+                <th>Contact</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="c in filtered"
+                :key="c.customerId"
+                @click="router.push(`/customers/${c.customerId}`)"
               >
-                No customers found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                <td>{{ c.companyName }}</td>
+                <td>{{ c.contactName }}</td>
+                <td>{{ c.city }}</td>
+                <td>{{ c.country }}</td>
+                <td>{{ c.phone }}</td>
+              </tr>
+              <tr v-if="!filtered.length">
+                <td
+                  colspan="5"
+                  style="
+                    text-align: center;
+                    padding: 32px;
+                    color: var(--text-muted);
+                  "
+                >
+                  No customers found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile: cards -->
+        <div class="customers-cards">
+          <div
+            v-for="c in filtered"
+            :key="c.customerId"
+            class="customer-card glass"
+            @click="router.push(`/customers/${c.customerId}`)"
+          >
+            <div class="customer-card__name">{{ c.companyName }}</div>
+            <div class="customer-card__contact">{{ c.contactName }}</div>
+            <div class="customer-card__meta">
+              <span v-if="c.city || c.country">{{
+                [c.city, c.country].filter(Boolean).join(", ")
+              }}</span>
+              <span v-if="c.phone" class="customer-card__phone">{{
+                c.phone
+              }}</span>
+            </div>
+          </div>
+          <p v-if="!filtered.length" class="customers-empty">
+            No customers found.
+          </p>
+        </div>
+      </template>
     </div>
   </AppLayout>
 </template>
