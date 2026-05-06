@@ -276,13 +276,15 @@ public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
             BillRegion      = dto.BillRegion,
             BillPostalCode  = dto.BillPostalCode,
             BillCountry     = dto.BillCountry,
-            OrderDetails    = dto.Lines.Select(l => new OrderDetail
-            {
-                ProductId = l.ProductId,
-                UnitPrice = l.UnitPrice,
-                Quantity  = l.Quantity,
-                Discount  = l.Discount
-            }).ToList()
+            OrderDetails    = dto.Lines
+                                .GroupBy(l => l.ProductId)
+                                .Select(g => new OrderDetail
+                                {
+                                    ProductId = g.Key,
+                                    UnitPrice = g.First().UnitPrice,
+                                    Quantity  = (short)g.Sum(l => l.Quantity),
+                                    Discount  = g.First().Discount
+                                }).ToList()
         };
 
         await _repository.AddAsync(order);
@@ -292,7 +294,8 @@ public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
     }
     catch (Exception ex)
     {
-        return StatusCode(500, $"Unexpected error while creating order: {ex.Message}");
+        var detail = ex.InnerException?.Message ?? ex.Message;
+        return StatusCode(500, $"Unexpected error while creating order: {detail}");
     }
 }
 
