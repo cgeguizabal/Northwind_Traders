@@ -72,7 +72,7 @@ async function openOrder(order) {
               {{ store.current.country }}
             </p>
             <p>
-              <Phone style="vertical-align: middle; margin-right: 4px" />
+              Phone:
               {{ store.current.phone }}
             </p>
           </div>

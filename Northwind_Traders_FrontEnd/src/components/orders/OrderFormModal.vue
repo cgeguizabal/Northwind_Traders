@@ -1,12 +1,13 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed, nextTick } from "vue";
 import AppModal from "../common/AppModal.vue";
 import AppSpinner from "../common/AppSpinner.vue";
 import { useToast } from "vue-toastification";
 import { getAllShipmentStates } from "../../axiosInstance/shipmentStateService.js";
 import { getActiveProducts } from "../../axiosInstance/productService.js";
-import { Xmark } from "iconoir-vue/regular";
+import { Xmark, MapPin, CheckCircle, WarningCircle } from "iconoir-vue/regular";
 import { useOrderStore } from "../../stores/orderStore.js";
+import { validateAddress } from "../../axiosInstance/geocodingService.js";
 
 const props = defineProps({
   // Pass existing order for edit mode; null for create mode
@@ -22,6 +23,138 @@ const statuses = ref([]);
 const products = ref([]);
 const loading = ref(false);
 const saving = ref(false);
+
+// ── Map ────────────────────────────────────────────────────────
+const mapEl = ref(null);
+let mapObj = null;
+let pinMarker = null;
+
+// ── Geocode state ──────────────────────────────────────────────
+const shipGeocode = reactive({ loading: false, result: null, error: null });
+const billGeocode = reactive({ loading: false, result: null, error: null });
+
+function buildAddressString(addr, city, region, postalCode, country) {
+  return [addr, city, region, postalCode, country].filter(Boolean).join(", ");
+}
+
+function loadGoogleMaps() {
+  return new Promise((resolve) => {
+    if (window.google?.maps) {
+      resolve();
+      return;
+    }
+    const key = import.meta.env.VITE_GOOGLE_MAPS_KEY;
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}`;
+    script.async = true;
+    script.onload = resolve;
+    document.head.appendChild(script);
+  });
+}
+
+async function initMap() {
+  await loadGoogleMaps();
+  const center = { lat: 48.8566, lng: 2.3522 };
+  mapObj = new window.google.maps.Map(mapEl.value, { center, zoom: 4 });
+
+  // If the order already has geocoded coordinates, pan to them
+  if (props.order?.shipLatitude && props.order?.shipLongitude) {
+    const pos = {
+      lat: Number(props.order.shipLatitude),
+      lng: Number(props.order.shipLongitude),
+    };
+    pinMarker = new window.google.maps.Marker({ position: pos, map: mapObj });
+    mapObj.panTo(pos);
+    mapObj.setZoom(13);
+  }
+
+  // Map click → reverse-geocode into ship address fields
+  mapObj.addListener("click", async (e) => {
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+    if (pinMarker) pinMarker.setMap(null);
+    pinMarker = new window.google.maps.Marker({
+      position: { lat, lng },
+      map: mapObj,
+    });
+    try {
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          const comps = results[0].address_components;
+          const get = (type) =>
+            comps.find((c) => c.types.includes(type))?.long_name || "";
+          form.shipAddress = get("route")
+            ? `${get("street_number")} ${get("route")}`.trim()
+            : results[0].formatted_address;
+          form.shipCity = get("locality") || get("administrative_area_level_2");
+          form.shipRegion = get("administrative_area_level_1");
+          form.shipPostalCode = get("postal_code");
+          form.shipCountry = get("country");
+        }
+      });
+    } catch {
+      /* non-critical */
+    }
+  });
+}
+
+async function geocodeShipAddress() {
+  const address = buildAddressString(
+    form.shipAddress,
+    form.shipCity,
+    form.shipRegion,
+    form.shipPostalCode,
+    form.shipCountry,
+  );
+  if (!address.trim()) {
+    toast.warning("Enter at least one ship address field first.");
+    return;
+  }
+  shipGeocode.loading = true;
+  shipGeocode.result = null;
+  shipGeocode.error = null;
+  try {
+    const { data } = await validateAddress(address);
+    shipGeocode.result = data;
+    if (mapObj && data.lat && data.lng) {
+      const pos = { lat: Number(data.lat), lng: Number(data.lng) };
+      if (pinMarker) pinMarker.setMap(null);
+      pinMarker = new window.google.maps.Marker({ position: pos, map: mapObj });
+      mapObj.panTo(pos);
+      mapObj.setZoom(13);
+    }
+  } catch {
+    shipGeocode.error = "Could not validate this address.";
+  } finally {
+    shipGeocode.loading = false;
+  }
+}
+
+async function geocodeBillAddress() {
+  const address = buildAddressString(
+    form.billAddress,
+    form.billCity,
+    form.billRegion,
+    form.billPostalCode,
+    form.billCountry,
+  );
+  if (!address.trim()) {
+    toast.warning("Enter at least one bill address field first.");
+    return;
+  }
+  billGeocode.loading = true;
+  billGeocode.result = null;
+  billGeocode.error = null;
+  try {
+    const { data } = await validateAddress(address);
+    billGeocode.result = data;
+  } catch {
+    billGeocode.error = "Could not validate this address.";
+  } finally {
+    billGeocode.loading = false;
+  }
+}
 
 // ── Form state ─────────────────────────────────────────────────
 const form = reactive({
@@ -128,6 +261,18 @@ async function save() {
       shipmentStateId: Number(form.shipmentStateId),
       shippedDate: form.shippedDate || null,
       freight: Number(form.freight),
+      notes: form.notes || null,
+      shipName: form.shipName || null,
+      shipAddress: form.shipAddress || null,
+      shipCity: form.shipCity || null,
+      shipRegion: form.shipRegion || null,
+      shipPostalCode: form.shipPostalCode || null,
+      shipCountry: form.shipCountry || null,
+      billAddress: form.billAddress || null,
+      billCity: form.billCity || null,
+      billRegion: form.billRegion || null,
+      billPostalCode: form.billPostalCode || null,
+      billCountry: form.billCountry || null,
       lines: form.lines.map((l) => ({
         productId: l.productId,
         unitPrice: l.unitPrice,
@@ -206,6 +351,14 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
+
+  // Init map after form data is loaded and DOM is rendered
+  await nextTick();
+  try {
+    await initMap();
+  } catch {
+    /* Maps API unavailable */
+  }
 });
 
 function formatCurrency(n) {
@@ -258,6 +411,155 @@ function formatCurrency(n) {
             step="0.01"
             class="form-control"
           />
+        </div>
+      </div>
+
+      <!-- ── Notes ─────────────────────────────────── -->
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea v-model="form.notes" class="form-control" rows="2" />
+      </div>
+
+      <!-- ── Ship Address ───────────────────────────── -->
+      <div class="section-title">Ship Address</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ship Name</label>
+          <input v-model="form.shipName" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input v-model="form.shipAddress" class="form-control" />
+        </div>
+      </div>
+      <div class="form-row form-row--4">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input v-model="form.shipCity" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Region</label>
+          <input v-model="form.shipRegion" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Postal Code</label>
+          <input v-model="form.shipPostalCode" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <input v-model="form.shipCountry" class="form-control" />
+        </div>
+      </div>
+
+      <!-- Map (click to set address) -->
+      <div ref="mapEl" class="order-modal-map" />
+
+      <!-- Geocode validate row -->
+      <div class="geocode-row">
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm geocode-btn"
+          :disabled="shipGeocode.loading"
+          @click="geocodeShipAddress"
+        >
+          <AppSpinner v-if="shipGeocode.loading" size="sm" />
+          <MapPin v-else />
+          <span>{{
+            shipGeocode.loading ? "Validating…" : "Validate & Geocode"
+          }}</span>
+        </button>
+        <div
+          v-if="shipGeocode.result"
+          class="geocode-result geocode-result--success"
+        >
+          <CheckCircle class="geocode-result__icon" />
+          <div class="geocode-result__body">
+            <span class="geocode-result__address">{{
+              shipGeocode.result.validatedAddress
+            }}</span>
+            <div class="geocode-coords">
+              <span class="coord-badge"
+                >{{ shipGeocode.result.lat?.toFixed(5) }}°N</span
+              >
+              <span class="coord-badge"
+                >{{ shipGeocode.result.lng?.toFixed(5) }}°E</span
+              >
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="shipGeocode.error"
+          class="geocode-result geocode-result--error"
+        >
+          <WarningCircle class="geocode-result__icon" />
+          <span>{{ shipGeocode.error }}</span>
+        </div>
+      </div>
+
+      <!-- ── Bill Address ───────────────────────────── -->
+      <div class="section-title">Bill Address</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input v-model="form.billAddress" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input v-model="form.billCity" class="form-control" />
+        </div>
+      </div>
+      <div class="form-row form-row--3">
+        <div class="form-group">
+          <label class="form-label">Region</label>
+          <input v-model="form.billRegion" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Postal Code</label>
+          <input v-model="form.billPostalCode" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <input v-model="form.billCountry" class="form-control" />
+        </div>
+      </div>
+      <div class="geocode-row">
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm geocode-btn"
+          :disabled="billGeocode.loading"
+          @click="geocodeBillAddress"
+        >
+          <AppSpinner v-if="billGeocode.loading" size="sm" />
+          <MapPin v-else />
+          <span>{{
+            billGeocode.loading ? "Validating…" : "Validate & Geocode"
+          }}</span>
+        </button>
+        <div
+          v-if="billGeocode.result"
+          class="geocode-result geocode-result--success"
+        >
+          <CheckCircle class="geocode-result__icon" />
+          <div class="geocode-result__body">
+            <span class="geocode-result__address">{{
+              billGeocode.result.validatedAddress
+            }}</span>
+            <div class="geocode-coords">
+              <span class="coord-badge"
+                >{{ billGeocode.result.lat?.toFixed(5) }}°N</span
+              >
+              <span class="coord-badge"
+                >{{ billGeocode.result.lng?.toFixed(5) }}°E</span
+              >
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="billGeocode.error"
+          class="geocode-result geocode-result--error"
+        >
+          <WarningCircle class="geocode-result__icon" />
+          <span>{{ billGeocode.error }}</span>
         </div>
       </div>
 
