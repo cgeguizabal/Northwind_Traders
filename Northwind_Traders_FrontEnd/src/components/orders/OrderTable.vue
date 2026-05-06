@@ -36,7 +36,8 @@ function formatCurrency(n) {
 </script>
 
 <template>
-  <div class="table-scroll">
+  <!-- Desktop: table -->
+  <div class="table-scroll order-table-desktop">
     <table class="data-table">
       <thead>
         <tr>
@@ -75,6 +76,40 @@ function formatCurrency(n) {
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Mobile: cards -->
+  <div class="order-cards">
+    <div
+      v-for="order in orders"
+      :key="order.orderId"
+      class="order-card glass"
+      @click="$emit('row-click', order)"
+    >
+      <div class="order-card__header">
+        <span class="order-card__id">#{{ order.orderId }}</span>
+        <AppBadge
+          :label="order.shipmentStatus || 'Unknown'"
+          :variant="statusVariant(order.shipmentStatus)"
+        />
+      </div>
+      <div class="order-card__customer">
+        {{ order.customerName || order.customerId }}
+      </div>
+      <div class="order-card__employee">
+        {{ order.employeeName || order.employeeId }}
+      </div>
+      <div class="order-card__meta">
+        <span>{{ formatDate(order.orderDate) }}</span>
+        <span class="order-card__freight">{{
+          formatCurrency(order.freight)
+        }}</span>
+      </div>
+      <div v-if="order.shipCountry" class="order-card__location">
+        {{ [order.shipCountry, order.shipRegion].filter(Boolean).join(" · ") }}
+      </div>
+    </div>
+    <p v-if="!orders.length" class="order-cards__empty">No orders found.</p>
   </div>
 </template>
 

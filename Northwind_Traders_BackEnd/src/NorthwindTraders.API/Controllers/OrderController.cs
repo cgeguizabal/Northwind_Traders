@@ -468,6 +468,43 @@ public async Task<IActionResult> ExportExcel()
         }
     }
 
+    // GET api/v1/orders/export/pdf
+    // Exports all orders as a landscape PDF report
+    [HttpGet("export/pdf")]
+    public async Task<IActionResult> ExportPdf()
+    {
+        try
+        {
+            var orders = await _repository.GetAllAsync();
+
+            var dtos = orders.Select(o => new OrderSummaryDto
+            {
+                OrderId        = o.OrderId,
+                OrderDate      = o.OrderDate,
+                RequiredDate   = o.RequiredDate,
+                ShippedDate    = o.ShippedDate,
+                Freight        = o.Freight,
+                ShipName       = o.ShipName,
+                ShipCity       = o.ShipCity,
+                ShipRegion     = o.ShipRegion,
+                ShipCountry    = o.ShipCountry,
+                CustomerName   = o.Customer?.CompanyName,
+                EmployeeName   = o.Employee is not null
+                                   ? $"{o.Employee.FirstName} {o.Employee.LastName}"
+                                   : null,
+                ShipmentStatus = o.ShipmentState?.Name
+            }).ToList();
+
+            var pdfBytes = _pdfService.GenerateOrdersReportPdf(dtos);
+
+            return File(pdfBytes, "application/pdf", $"Orders_{DateTime.UtcNow:yyyy-MM-dd}.pdf");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Unexpected error while exporting orders to PDF: {ex.Message}");
+        }
+    }
+
     // POST api/v1/orders/geocode-all
     // Geocodes all orders that have no coordinates yet
     [HttpPost("geocode-all")]
