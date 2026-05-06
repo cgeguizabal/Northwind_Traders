@@ -191,7 +191,7 @@ const newLine = reactive({
 
 const filteredProducts = computed(() =>
   products.value.filter((p) =>
-    p.productName.toLowerCase().includes(productSearch.value.toLowerCase()),
+    p.productName.toLowerCase().startsWith(productSearch.value.toLowerCase()),
   ),
 );
 
@@ -200,7 +200,7 @@ const filteredCustomers = computed(() =>
   customers.value.filter((c) =>
     (c.companyName || "")
       .toLowerCase()
-      .includes(customerSearch.value.toLowerCase()),
+      .startsWith(customerSearch.value.toLowerCase()),
   ),
 );
 
