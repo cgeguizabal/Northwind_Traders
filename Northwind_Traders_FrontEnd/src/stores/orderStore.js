@@ -7,6 +7,7 @@ import {
   updateOrder,
   updateOrderStatus,
   exportOrdersExcel,
+  exportOrdersPdf,
   geocodeOrder,
 } from "../axiosInstance/orderService.js";
 
@@ -77,6 +78,20 @@ export const useOrderStore = defineStore("orders", () => {
     URL.revokeObjectURL(url);
   }
 
+  async function downloadPdf() {
+    const { data } = await exportOrdersPdf();
+    const url = URL.createObjectURL(
+      new Blob([data], { type: "application/pdf" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Orders_${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   return {
     orders,
     current,
@@ -88,5 +103,6 @@ export const useOrderStore = defineStore("orders", () => {
     submitUpdateOrder,
     submitUpdateStatus,
     downloadExcel,
+    downloadPdf,
   };
 });

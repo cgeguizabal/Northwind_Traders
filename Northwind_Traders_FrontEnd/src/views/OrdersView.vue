@@ -11,7 +11,7 @@ import { useOrderStore } from "../stores/orderStore.js";
 import { useToast } from "vue-toastification";
 import { getOrderById } from "../axiosInstance/orderService.js";
 import { useRouter } from "vue-router";
-import { StatsReport, Plus, Printer } from "iconoir-vue/regular";
+import { StatsReport, Plus, Printer, Page } from "iconoir-vue/regular";
 
 const store = useOrderStore();
 const toast = useToast();
@@ -157,6 +157,15 @@ async function exportExcel() {
   }
 }
 
+// ── PDF export (all orders) ────────────────────────────────────
+async function exportPdf() {
+  try {
+    await store.downloadPdf();
+  } catch {
+    toast.error("Failed to export PDF.");
+  }
+}
+
 // ── Print/PDF export (Reports tab) ────────────────────────────
 function printReport() {
   window.print();
@@ -179,6 +188,9 @@ onMounted(async () => {
         <div class="header-actions">
           <button class="btn btn-secondary btn-sm" @click="exportExcel">
             <StatsReport /> Export Excel
+          </button>
+          <button class="btn btn-secondary btn-sm" @click="exportPdf">
+            <Page /> Export PDF
           </button>
           <button
             class="btn btn-primary btn-sm"
@@ -244,14 +256,6 @@ onMounted(async () => {
 
       <!-- Tab: Reports -->
       <template v-else>
-        <div class="reports-actions">
-          <button class="btn btn-secondary btn-sm" @click="exportExcel">
-            <StatsReport /> Export Excel
-          </button>
-          <button class="btn btn-secondary btn-sm" @click="printReport">
-            <Printer /> Print / Save PDF
-          </button>
-        </div>
         <div class="reports-charts">
           <BarChart
             :labels="countryLabels"
