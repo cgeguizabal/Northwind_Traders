@@ -5,7 +5,7 @@ defineProps({
   orders: { type: Array, required: true },
 });
 
-const emit = defineEmits(["row-click"]);
+const emit = defineEmits(["row-click", "deactivate"]);
 
 // Map shipment status names to badge variants
 function statusVariant(statusName) {
@@ -49,6 +49,7 @@ function formatCurrency(n) {
           <th>Region</th>
           <th>Freight</th>
           <th>Status</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -70,9 +71,17 @@ function formatCurrency(n) {
               :variant="statusVariant(order.shipmentStatus)"
             />
           </td>
+          <td>
+            <button
+              class="btn btn-danger btn-xs"
+              @click.stop="$emit('deactivate', order)"
+            >
+              Delete
+            </button>
+          </td>
         </tr>
         <tr v-if="!orders.length">
-          <td colspan="8" class="table-empty">No orders found.</td>
+          <td colspan="9" class="table-empty">No orders found.</td>
         </tr>
       </tbody>
     </table>
@@ -92,6 +101,12 @@ function formatCurrency(n) {
           :label="order.shipmentStatus || 'Unknown'"
           :variant="statusVariant(order.shipmentStatus)"
         />
+        <button
+          class="btn btn-danger btn-xs order-card__delete"
+          @click.stop="$emit('deactivate', order)"
+        >
+          Delete
+        </button>
       </div>
       <div class="order-card__customer">
         {{ order.customerName || order.customerId }}

@@ -17,3 +17,4 @@ export const exportOrdersPdf = () =>
   api.get("/orders/export/pdf", { responseType: "blob" });
 export const geocodeOrder = (id) => api.post(`/orders/${id}/geocode`);
 export const geocodeAllOrders = () => api.post("/orders/geocode-all");
+export const deactivateOrder = (id) => api.put(`/orders/${id}/deactivate`);

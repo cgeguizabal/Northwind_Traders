@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
+import AppModal from "../components/common/AppModal.vue";
 import OrderTable from "../components/orders/OrderTable.vue";
 import OrderDetailModal from "../components/orders/OrderDetailModal.vue";
 import OrderFormModal from "../components/orders/OrderFormModal.vue";
@@ -171,6 +172,32 @@ function printReport() {
   window.print();
 }
 
+// ── Soft delete (deactivate) ───────────────────────────────────
+const showDeleteConfirm = ref(false);
+const orderToDelete = ref(null);
+
+function promptDelete(order) {
+  orderToDelete.value = order;
+  showDeleteConfirm.value = true;
+}
+
+async function confirmDelete() {
+  try {
+    await store.softDeleteOrder(orderToDelete.value.orderId);
+    toast.success(`Order #${orderToDelete.value.orderId} deleted.`);
+  } catch {
+    toast.error("Failed to delete order.");
+  } finally {
+    showDeleteConfirm.value = false;
+    orderToDelete.value = null;
+  }
+}
+
+function cancelDelete() {
+  showDeleteConfirm.value = false;
+  orderToDelete.value = null;
+}
+
 onMounted(async () => {
   try {
     await store.fetchOrders();
@@ -251,7 +278,11 @@ onMounted(async () => {
 
       <!-- Tab: Orders Table -->
       <template v-else-if="activeTab === 'orders'">
-        <OrderTable :orders="filteredOrders" @row-click="openDetail" />
+        <OrderTable
+          :orders="filteredOrders"
+          @row-click="openDetail"
+          @deactivate="promptDelete"
+        />
       </template>
 
       <!-- Tab: Reports -->
@@ -293,6 +324,24 @@ onMounted(async () => {
         @close="closeEdit"
         @saved="onSaved"
       />
+
+      <!-- Delete Confirmation Modal -->
+      <AppModal
+        v-if="showDeleteConfirm"
+        title="Delete Order"
+        width="420px"
+        @close="cancelDelete"
+      >
+        <p>Are you sure you want to delete this item?</p>
+        <template #footer>
+          <button class="btn btn-secondary" @click="cancelDelete">
+            Cancel
+          </button>
+          <button class="btn btn-danger" @click="confirmDelete">
+            Yes, delete
+          </button>
+        </template>
+      </AppModal>
     </div>
   </AppLayout>
 </template>

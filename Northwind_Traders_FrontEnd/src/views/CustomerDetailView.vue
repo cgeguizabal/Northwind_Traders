@@ -3,7 +3,6 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
-import CustomerMap from "../components/customers/CustomerMap.vue";
 import OrderTable from "../components/orders/OrderTable.vue";
 import OrderDetailModal from "../components/orders/OrderDetailModal.vue";
 import { useCustomerStore } from "../stores/customerStore.js";
@@ -22,10 +21,7 @@ const detailLoading = ref(false);
 
 onMounted(async () => {
   try {
-    await Promise.all([
-      store.fetchCustomer(route.params.id),
-      store.fetchMapPins(route.params.id),
-    ]);
+    await store.fetchCustomer(route.params.id);
   } catch {
     toast.error("Failed to load customer data.");
   }
@@ -82,9 +78,6 @@ async function openOrder(order) {
             }}</span>
           </div>
         </div>
-
-        <!-- Map -->
-        <CustomerMap :pins="store.mapPins" style="margin: 24px 0" />
 
         <!-- Orders -->
         <h3 class="section-title">Orders</h3>

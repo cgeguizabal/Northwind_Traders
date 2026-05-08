@@ -9,6 +9,7 @@ import {
   exportOrdersExcel,
   exportOrdersPdf,
   geocodeOrder,
+  deactivateOrder,
 } from "../axiosInstance/orderService.js";
 
 export const useOrderStore = defineStore("orders", () => {
@@ -66,6 +67,11 @@ export const useOrderStore = defineStore("orders", () => {
     await updateOrderStatus(id, statusId);
   }
 
+  async function softDeleteOrder(id) {
+    await deactivateOrder(id);
+    orders.value = orders.value.filter((o) => o.orderId !== id);
+  }
+
   async function downloadExcel() {
     const { data } = await exportOrdersExcel();
     const url = URL.createObjectURL(new Blob([data]));
@@ -102,6 +108,7 @@ export const useOrderStore = defineStore("orders", () => {
     submitCreateOrder,
     submitUpdateOrder,
     submitUpdateStatus,
+    softDeleteOrder,
     downloadExcel,
     downloadPdf,
   };

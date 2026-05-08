@@ -17,7 +17,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<IReadOnlyList<Customer>> GetAllAsync()
     {
         return await _context.Customers
-            .Include(c => c.Orders) 
+            .Include(c => c.Orders.Where(o => o.IsActive == "Y")) 
             .OrderBy(c => c.CompanyName)
             .ToListAsync();
     }
@@ -25,7 +25,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> GetByIdAsync(string customerId)
     {
         return await _context.Customers
-            .Include(c => c.Orders)
+            .Include(c => c.Orders.Where(o => o.IsActive == "Y"))
                 .ThenInclude(o => o.ShipmentState)
             .FirstOrDefaultAsync(c => c.CustomerId == customerId);
     }
@@ -54,7 +54,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<IReadOnlyList<Order>> GetOrdersByCustomerAsync(string customerId)
     {
         return await _context.Orders
-            .Where(o => o.CustomerId == customerId && o.ShipLatitude != null)
+            .Where(o => o.CustomerId == customerId && o.IsActive == "Y" && o.ShipLatitude != null)
             .Include(o => o.ShipmentState)
             .Select(o => new Order
             {

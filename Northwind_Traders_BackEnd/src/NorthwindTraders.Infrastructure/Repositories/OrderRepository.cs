@@ -18,10 +18,11 @@ public class OrderRepository : IOrderRepository
 
     public async Task<Order?> GetByIdAsync(int id)
         => await _context.Orders
-            .FirstOrDefaultAsync(o => o.OrderId == id);    // EF Core Method
+            .FirstOrDefaultAsync(o => o.OrderId == id && o.IsActive == "Y");    // EF Core Method
 
     public async Task<IReadOnlyList<Order>> GetAllAsync()
     => await _context.Orders
+        .Where(o => o.IsActive == "Y")
         .Include(o => o.Customer)
         .Include(o => o.Employee)
         .Include(o => o.ShipmentState)
@@ -49,25 +50,38 @@ public class OrderRepository : IOrderRepository
             .Include(o => o.ShipmentState)                  // EF Core Method
             .Include(o => o.OrderDetails)                   // EF Core Method
                 .ThenInclude(od => od.Product)              // EF Core Method — nested include
-            .FirstOrDefaultAsync(o => o.OrderId == orderId); // EF Core Method
+            .FirstOrDefaultAsync(o => o.OrderId == orderId && o.IsActive == "Y"); // EF Core Method
 
     public async Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId)
         => await _context.Orders
-            .Where(o => o.CustomerId == customerId)         // EF Core Method
+            .Where(o => o.CustomerId == customerId && o.IsActive == "Y")
             .ToListAsync();                                 // EF Core Method
 
     public async Task<IReadOnlyList<Order>> GetByEmployeeAsync(int employeeId)
         => await _context.Orders
-            .Where(o => o.EmployeeId == employeeId)         // EF Core Method
+            .Where(o => o.EmployeeId == employeeId && o.IsActive == "Y")
             .ToListAsync();                                 // EF Core Method
 
     public async Task<IReadOnlyList<Order>> GetByShipmentStatusAsync(int shipmentStateId)
         => await _context.Orders
-            .Where(o => o.ShipmentStateId == shipmentStateId) // EF Core Method
+            .Where(o => o.ShipmentStateId == shipmentStateId && o.IsActive == "Y")
             .ToListAsync();                                   // EF Core Method
 
     public async Task<IReadOnlyList<Order>> GetByDateRangeAsync(DateTime from, DateTime to)
         => await _context.Orders
-            .Where(o => o.OrderDate >= from && o.OrderDate <= to)  // EF Core Method
+            .Where(o => o.OrderDate >= from && o.OrderDate <= to && o.IsActive == "Y")
             .ToListAsync();                                        // EF Core Method
+
+    public async Task DeactivateAsync(int orderId)
+    {
+        var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+        if (order is not null)
+        {
+            order.IsActive = "N";
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public void DeleteOrderDetails(ICollection<OrderDetail> orderDetails)
+        => _context.OrderDetails.RemoveRange(orderDetails);        // EF Core Method
 }
