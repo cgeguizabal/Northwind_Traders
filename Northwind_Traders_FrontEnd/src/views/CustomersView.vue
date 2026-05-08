@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
@@ -11,23 +11,21 @@ const router = useRouter();
 const toast = useToast();
 const search = ref("");
 
-onMounted(async () => {
+async function load(page = 1) {
   try {
-    await store.fetchCustomers();
+    await store.fetchCustomers(page, search.value);
   } catch {
     toast.error("Failed to load customers.");
   }
-});
+}
 
-const filtered = computed(() => {
-  const q = search.value.toLowerCase();
-  return store.customers.filter(
-    (c) =>
-      (c.companyName || "").toLowerCase().includes(q) ||
-      (c.contactName || "").toLowerCase().includes(q) ||
-      (c.city || "").toLowerCase().includes(q) ||
-      (c.country || "").toLowerCase().includes(q),
-  );
+onMounted(() => load(1));
+
+// Debounce search — reset to page 1 on new search
+let debounceTimer;
+watch(search, () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => load(1), 350);
 });
 </script>
 
@@ -62,7 +60,7 @@ const filtered = computed(() => {
             </thead>
             <tbody>
               <tr
-                v-for="c in filtered"
+                v-for="c in store.customers"
                 :key="c.customerId"
                 @click="router.push(`/customers/${c.customerId}`)"
               >
@@ -72,7 +70,7 @@ const filtered = computed(() => {
                 <td>{{ c.country }}</td>
                 <td>{{ c.phone }}</td>
               </tr>
-              <tr v-if="!filtered.length">
+              <tr v-if="!store.customers.length">
                 <td
                   colspan="5"
                   style="
@@ -91,7 +89,7 @@ const filtered = computed(() => {
         <!-- Mobile: cards -->
         <div class="customers-cards">
           <div
-            v-for="c in filtered"
+            v-for="c in store.customers"
             :key="c.customerId"
             class="customer-card glass"
             @click="router.push(`/customers/${c.customerId}`)"
@@ -107,9 +105,31 @@ const filtered = computed(() => {
               }}</span>
             </div>
           </div>
-          <p v-if="!filtered.length" class="customers-empty">
+          <p v-if="!store.customers.length" class="customers-empty">
             No customers found.
           </p>
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="store.totalPages > 1" class="pagination">
+          <button
+            class="btn btn-secondary btn-sm"
+            :disabled="store.page <= 1"
+            @click="load(store.page - 1)"
+          >
+            ‹ Prev
+          </button>
+          <span class="pagination__info">
+            Page {{ store.page }} of {{ store.totalPages }}
+            <span class="pagination__count">({{ store.totalCount }} customers)</span>
+          </span>
+          <button
+            class="btn btn-secondary btn-sm"
+            :disabled="store.page >= store.totalPages"
+            @click="load(store.page + 1)"
+          >
+            Next ›
+          </button>
         </div>
       </template>
     </div>
