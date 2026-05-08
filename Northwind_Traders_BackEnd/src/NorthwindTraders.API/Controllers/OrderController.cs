@@ -276,6 +276,7 @@ public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
             BillRegion      = dto.BillRegion,
             BillPostalCode  = dto.BillPostalCode,
             BillCountry     = dto.BillCountry,
+            IsActive        = "Y",
             OrderDetails    = dto.Lines
                                 .GroupBy(l => l.ProductId)
                                 .Select(g => new OrderDetail
@@ -468,6 +469,43 @@ public async Task<IActionResult> ExportExcel()
         }
     }
 
+    // GET api/v1/orders/export/pdf
+    // Exports all orders as a landscape PDF report
+    [HttpGet("export/pdf")]
+    public async Task<IActionResult> ExportPdf()
+    {
+        try
+        {
+            var orders = await _repository.GetAllAsync();
+
+            var dtos = orders.Select(o => new OrderSummaryDto
+            {
+                OrderId        = o.OrderId,
+                OrderDate      = o.OrderDate,
+                RequiredDate   = o.RequiredDate,
+                ShippedDate    = o.ShippedDate,
+                Freight        = o.Freight,
+                ShipName       = o.ShipName,
+                ShipCity       = o.ShipCity,
+                ShipRegion     = o.ShipRegion,
+                ShipCountry    = o.ShipCountry,
+                CustomerName   = o.Customer?.CompanyName,
+                EmployeeName   = o.Employee is not null
+                                   ? $"{o.Employee.FirstName} {o.Employee.LastName}"
+                                   : null,
+                ShipmentStatus = o.ShipmentState?.Name
+            }).ToList();
+
+            var pdfBytes = _pdfService.GenerateOrdersReportPdf(dtos);
+
+            return File(pdfBytes, "application/pdf", $"Orders_{DateTime.UtcNow:yyyy-MM-dd}.pdf");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Unexpected error while exporting orders to PDF: {ex.Message}");
+        }
+    }
+
     // POST api/v1/orders/geocode-all
     // Geocodes all orders that have no coordinates yet
     [HttpPost("geocode-all")]
@@ -489,6 +527,55 @@ public async Task<IActionResult> ExportExcel()
         catch (Exception ex)
         {
             return StatusCode(500, $"An unexpected error occurred while geocoding pending orders: {ex.Message}");
+        }
+    }
+
+    // PUT api/v1/orders/{id}/deactivate
+    // Soft-delete: sets IsActive = 'N' — order is hidden from all views
+    [HttpPut("{id}/deactivate")]
+    public async Task<IActionResult> Deactivate(int id)
+    {
+        try
+        {
+            var order = await _repository.GetByIdAsync(id);
+            if (order is null)
+                return NotFound($"Order with id {id} was not found.");
+
+            await _repository.DeactivateAsync(id);
+            return Ok($"Order {id} has been deactivated.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error occurred while deactivating order {id}: {ex.Message}");
+        }
+    }
+
+    // DELETE api/v1/orders/{id}
+    // Restricted to Vice President, Sales and Sales Manager only
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var title = User.FindFirst("Title")?.Value ?? string.Empty;
+        if (title != "Vice President, Sales" && title != "Sales Manager")
+            return Forbid();
+
+        try
+        {
+            var order = await _repository.GetOrderWithDetailsAsync(id);
+            if (order is null)
+                return NotFound($"Order with id {id} was not found.");
+
+            // Remove child OrderDetails first to avoid FK constraint violations
+            _repository.DeleteOrderDetails(order.OrderDetails);
+
+            _repository.Delete(order);
+            await _repository.SaveChangesAsync();
+
+            return Ok($"Success order number {id} has been deleted.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error occurred while deleting order {id}: {ex.Message}");
         }
     }
 }

@@ -18,15 +18,18 @@ public class CustomersController : ControllerBase
         _repository = repository;
     }
 
-    // GET api/v1/customers
+    // GET api/v1/customers?page=1&pageSize=10&search=text
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
     {
         try
         {
-            var customers = await _repository.GetAllAsync();
+            var (customers, totalCount) = await _repository.GetPagedAsync(page, pageSize, search);
 
-            var dtos = customers.Select(c => new CustomerSummaryDto
+            var items = customers.Select(c => new CustomerSummaryDto
             {
                 CustomerId   = c.CustomerId,
                 CompanyName  = c.CompanyName,
@@ -38,7 +41,14 @@ public class CustomersController : ControllerBase
                 TotalOrders  = c.Orders?.Count ?? 0
             }).ToList();
 
-            return Ok(dtos);
+            return Ok(new PagedResult<CustomerSummaryDto>
+            {
+                Items      = items,
+                TotalCount = totalCount,
+                Page       = page,
+                PageSize   = pageSize,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            });
         }
         catch (InvalidOperationException ex)
         {

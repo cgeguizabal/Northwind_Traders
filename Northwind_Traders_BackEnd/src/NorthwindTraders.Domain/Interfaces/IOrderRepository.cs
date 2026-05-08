@@ -26,4 +26,10 @@ public interface IOrderRepository : IRepository<Order>
     // Get orders within a date range
     // Used for reporting and dashboard metrics
     Task<IReadOnlyList<Order>> GetByDateRangeAsync(DateTime from, DateTime to);
+
+    // Remove all order detail lines for an order (must be called before deleting the order)
+    void DeleteOrderDetails(ICollection<OrderDetail> orderDetails);
+
+    // Soft-delete: sets IsActive = 'N' so the order is hidden from all queries
+    Task DeactivateAsync(int orderId);
 }

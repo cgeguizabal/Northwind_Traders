@@ -23,13 +23,13 @@ public class DashboardService : IDashboardService
 
         // ── TOTAL ORDERS ──────────────────────────────────────────────────────
         // CountAsync — EF Core Method — SELECT COUNT(*) FROM Orders
-        var ordersQuery = _context.Orders.AsQueryable();
+        var ordersQuery = _context.Orders.Where(o => o.IsActive == "Y").AsQueryable();
         if (dateFrom.HasValue)   ordersQuery = ordersQuery.Where(o => o.OrderDate >= dateFrom.Value.Date);
         if (toInclusive.HasValue) ordersQuery = ordersQuery.Where(o => o.OrderDate < toInclusive.Value);
         var totalOrders = await ordersQuery.CountAsync();
 
         // ── TOTAL REVENUE ─────────────────────────────────────────────────────
-        var detailsQuery = _context.OrderDetails.AsQueryable();
+        var detailsQuery = _context.OrderDetails.Where(od => od.Order!.IsActive == "Y").AsQueryable();
         if (dateFrom.HasValue)   detailsQuery = detailsQuery.Where(od => od.Order!.OrderDate >= dateFrom.Value.Date);
         if (toInclusive.HasValue) detailsQuery = detailsQuery.Where(od => od.Order!.OrderDate < toInclusive.Value);
         var totalRevenue = await detailsQuery

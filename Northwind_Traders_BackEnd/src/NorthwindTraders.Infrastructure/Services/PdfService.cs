@@ -217,4 +217,135 @@ public class PdfService : IPdfService
             throw new InvalidOperationException($"Failed to generate PDF document: {ex.Message}", ex);
         }
     }
+
+    // ── BULK ORDERS REPORT ────────────────────────────────────────────────────
+    // Generates a landscape summary PDF containing every order in the supplied list.
+    public byte[] GenerateOrdersReportPdf(IEnumerable<OrderSummaryDto> orders)
+    {
+        try
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var orderList = orders.ToList();
+
+            return Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape());
+                    page.Margin(30);
+                    page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Arial"));
+
+                    // ── HEADER ────────────────────────────────────────────────
+                    page.Header().Column(col =>
+                    {
+                        col.Item().Row(row =>
+                        {
+                            row.RelativeItem()
+                                .Text("Northwind Traders — Orders Report")
+                                .FontSize(16).Bold()
+                                .FontColor(Color.FromHex("#1a1a2e"));
+
+                            row.ConstantItem(200).AlignRight()
+                                .Text($"Generated {DateTime.UtcNow:MMM dd, yyyy}")
+                                .FontSize(9)
+                                .FontColor(Color.FromHex("#666666"));
+                        });
+
+                        col.Item().PaddingTop(4)
+                            .LineHorizontal(1)
+                            .LineColor(Color.FromHex("#0f3460"));
+
+                        col.Item().PaddingTop(4)
+                            .Text($"Total orders: {orderList.Count}  •  Total freight: ${orderList.Sum(o => o.Freight ?? 0):N2}")
+                            .FontSize(9)
+                            .FontColor(Color.FromHex("#444444"));
+                    });
+
+                    // ── CONTENT ───────────────────────────────────────────────
+                    page.Content().PaddingTop(12).Table(table =>
+                    {
+                        table.ColumnsDefinition(cols =>
+                        {
+                            cols.ConstantColumn(52);   // Order ID
+                            cols.RelativeColumn(3);    // Customer
+                            cols.RelativeColumn(3);    // Employee
+                            cols.ConstantColumn(72);   // Order Date
+                            cols.ConstantColumn(72);   // Shipped Date
+                            cols.RelativeColumn(2);    // Ship Country
+                            cols.RelativeColumn(2);    // Region
+                            cols.ConstantColumn(62);   // Freight
+                            cols.ConstantColumn(72);   // Status
+                        });
+
+                        // Header row
+                        table.Header(header =>
+                        {
+                            var hs = TextStyle.Default.Bold().FontColor(Colors.White).FontSize(9);
+                            var bg = Color.FromHex("#1a1a2e");
+
+                            header.Cell().Background(bg).Padding(5).Text("Order #").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Customer").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Employee").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Order Date").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Shipped").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Country").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Region").Style(hs);
+                            header.Cell().Background(bg).Padding(5).AlignRight().Text("Freight").Style(hs);
+                            header.Cell().Background(bg).Padding(5).Text("Status").Style(hs);
+                        });
+
+                        // Data rows — alternating background
+                        var rowIndex = 0;
+                        foreach (var o in orderList)
+                        {
+                            var bg = rowIndex % 2 == 0
+                                ? Colors.White
+                                : Color.FromHex("#f5f5f5");
+
+                            var statusColor = (o.ShipmentStatus ?? "").ToLower() switch
+                            {
+                                var s when s.Contains("ship")    => "#27ae60",
+                                var s when s.Contains("complet") => "#2980b9",
+                                var s when s.Contains("cancel")  => "#e74c3c",
+                                var s when s.Contains("pending") => "#f39c12",
+                                _                                => "#7f8c8d"
+                            };
+
+                            table.Cell().Background(bg).Padding(5).Text(o.OrderId.ToString());
+                            table.Cell().Background(bg).Padding(5).Text(o.CustomerName ?? "—");
+                            table.Cell().Background(bg).Padding(5).Text(o.EmployeeName ?? "—");
+                            table.Cell().Background(bg).Padding(5).Text(o.OrderDate?.ToString("yyyy-MM-dd") ?? "—");
+                            table.Cell().Background(bg).Padding(5).Text(o.ShippedDate?.ToString("yyyy-MM-dd") ?? "—");
+                            table.Cell().Background(bg).Padding(5).Text(o.ShipCountry ?? "—");
+                            table.Cell().Background(bg).Padding(5).Text(o.ShipRegion ?? "—");
+                            table.Cell().Background(bg).Padding(5).AlignRight().Text($"${o.Freight ?? 0:N2}");
+                            table.Cell().Background(bg).Padding(3)
+                                .Background(Color.FromHex(statusColor))
+                                .Padding(3)
+                                .Text(o.ShipmentStatus ?? "—")
+                                .FontColor(Colors.White)
+                                .FontSize(8);
+
+                            rowIndex++;
+                        }
+                    });
+
+                    // ── FOOTER ────────────────────────────────────────────────
+                    page.Footer().AlignCenter().Text(txt =>
+                    {
+                        txt.Span("Northwind Traders  •  Page ");
+                        txt.CurrentPageNumber();
+                        txt.Span(" of ");
+                        txt.TotalPages();
+                    });
+                });
+            })
+            .GeneratePdf();
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to generate orders report PDF: {ex.Message}", ex);
+        }
+    }
 }

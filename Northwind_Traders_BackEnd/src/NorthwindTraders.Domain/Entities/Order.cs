@@ -81,4 +81,7 @@ public class Order
 
     /// Line items for this order.
     public ICollection<OrderDetail> OrderDetails { get; set; } = [];
+
+    /// Soft-delete flag. 'Y' = active, 'N' = deleted.
+    public string? IsActive { get; set; }
 }

@@ -100,7 +100,7 @@ public class GeocodingService : IGeocodingService
     {
         try
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.IsActive == "Y");
 
             if (order is null)
                 return Result<(string?, decimal?, decimal?, string?, decimal?, decimal?)>
@@ -209,7 +209,8 @@ public class GeocodingService : IGeocodingService
         try
         {
             pendingOrders = await _context.Orders
-                .Where(o => o.ShipLatitude == null
+                .Where(o => o.IsActive == "Y"
+                         && o.ShipLatitude == null
                          && (o.ShipAddress != null || o.ShipCity != null))
                 .Select(o => o.OrderId)   // only fetch IDs — we load each one individually
                 .ToListAsync();

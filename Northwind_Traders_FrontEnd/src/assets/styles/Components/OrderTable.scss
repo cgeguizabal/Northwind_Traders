@@ -1,12 +1,94 @@
-@use '../variables' as *;
+@use "../variables" as *;
+@use "../mixins" as *;
 
 .table-scroll {
-  overflow-x:    auto;
+  overflow-x: auto;
   border-radius: $radius-md;
 }
 
 .table-empty {
   text-align: center;
-  color:      var(--text-muted);
-  padding:    $spacing-xl !important;
+  color: var(--text-muted);
+  padding: $spacing-xl !important;
+}
+
+// ── Desktop table ─────────────────────────────────────────────
+.order-table-desktop {
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Mobile cards ──────────────────────────────────────────────
+.order-cards {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}
+
+.order-card {
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__id {
+    font-weight: 700;
+    font-size: $font-size-base;
+    color: $color-purple-light;
+    font-family: monospace;
+  }
+
+  &__customer {
+    font-weight: 600;
+    font-size: $font-size-base;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  &__employee {
+    font-size: $font-size-sm;
+    color: var(--text-muted);
+    margin-bottom: $spacing-xs;
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: $font-size-sm;
+    color: var(--text-muted);
+  }
+
+  &__freight {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__location {
+    margin-top: $spacing-xs;
+    font-size: $font-size-sm;
+    color: var(--text-muted);
+  }
+}
+
+.order-cards__empty {
+  text-align: center;
+  padding: $spacing-xl;
+  color: var(--text-muted);
 }

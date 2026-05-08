@@ -38,6 +38,7 @@ public class JwtService : IJwtService
                 new Claim(ClaimTypes.NameIdentifier, employee.EmployeeId.ToString()),
                 new Claim(ClaimTypes.Email,          employee.Email!),
                 new Claim(ClaimTypes.Name,           $"{employee.FirstName} {employee.LastName}"),
+                new Claim("Title",                   employee.Title ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // unique token id
             };
 

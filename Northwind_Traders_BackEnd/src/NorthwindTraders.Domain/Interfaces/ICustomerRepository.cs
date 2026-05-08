@@ -12,6 +12,7 @@ public interface ICustomerRepository
 {
     Task<Customer?> GetByIdAsync(string customerId);         // string PK
     Task<IReadOnlyList<Customer>> GetAllAsync();
+    Task<(IReadOnlyList<Customer> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? search);
     Task<Customer?> GetByCompanyNameAsync(string companyName);
     Task AddAsync(Customer customer);
     void Update(Customer customer);

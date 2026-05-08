@@ -5,7 +5,7 @@ defineProps({
   orders: { type: Array, required: true },
 });
 
-const emit = defineEmits(["row-click"]);
+const emit = defineEmits(["row-click", "deactivate"]);
 
 // Map shipment status names to badge variants
 function statusVariant(statusName) {
@@ -36,7 +36,8 @@ function formatCurrency(n) {
 </script>
 
 <template>
-  <div class="table-scroll">
+  <!-- Desktop: table -->
+  <div class="table-scroll order-table-desktop">
     <table class="data-table">
       <thead>
         <tr>
@@ -48,6 +49,7 @@ function formatCurrency(n) {
           <th>Region</th>
           <th>Freight</th>
           <th>Status</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -69,12 +71,60 @@ function formatCurrency(n) {
               :variant="statusVariant(order.shipmentStatus)"
             />
           </td>
+          <td>
+            <button
+              class="btn btn-danger btn-xs"
+              @click.stop="$emit('deactivate', order)"
+            >
+              Delete
+            </button>
+          </td>
         </tr>
         <tr v-if="!orders.length">
-          <td colspan="8" class="table-empty">No orders found.</td>
+          <td colspan="9" class="table-empty">No orders found.</td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Mobile: cards -->
+  <div class="order-cards">
+    <div
+      v-for="order in orders"
+      :key="order.orderId"
+      class="order-card glass"
+      @click="$emit('row-click', order)"
+    >
+      <div class="order-card__header">
+        <span class="order-card__id">#{{ order.orderId }}</span>
+        <AppBadge
+          :label="order.shipmentStatus || 'Unknown'"
+          :variant="statusVariant(order.shipmentStatus)"
+        />
+        <button
+          class="btn btn-danger btn-xs order-card__delete"
+          @click.stop="$emit('deactivate', order)"
+        >
+          Delete
+        </button>
+      </div>
+      <div class="order-card__customer">
+        {{ order.customerName || order.customerId }}
+      </div>
+      <div class="order-card__employee">
+        {{ order.employeeName || order.employeeId }}
+      </div>
+      <div class="order-card__meta">
+        <span>{{ formatDate(order.orderDate) }}</span>
+        <span class="order-card__freight">{{
+          formatCurrency(order.freight)
+        }}</span>
+      </div>
+      <div v-if="order.shipCountry" class="order-card__location">
+        {{ [order.shipCountry, order.shipRegion].filter(Boolean).join(" · ") }}
+      </div>
+    </div>
+    <p v-if="!orders.length" class="order-cards__empty">No orders found.</p>
   </div>
 </template>
 

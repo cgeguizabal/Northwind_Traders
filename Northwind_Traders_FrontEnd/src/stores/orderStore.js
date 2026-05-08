@@ -7,7 +7,9 @@ import {
   updateOrder,
   updateOrderStatus,
   exportOrdersExcel,
+  exportOrdersPdf,
   geocodeOrder,
+  deactivateOrder,
 } from "../axiosInstance/orderService.js";
 
 export const useOrderStore = defineStore("orders", () => {
@@ -65,12 +67,31 @@ export const useOrderStore = defineStore("orders", () => {
     await updateOrderStatus(id, statusId);
   }
 
+  async function softDeleteOrder(id) {
+    await deactivateOrder(id);
+    orders.value = orders.value.filter((o) => o.orderId !== id);
+  }
+
   async function downloadExcel() {
     const { data } = await exportOrdersExcel();
     const url = URL.createObjectURL(new Blob([data]));
     const link = document.createElement("a");
     link.href = url;
     link.download = "orders.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  async function downloadPdf() {
+    const { data } = await exportOrdersPdf();
+    const url = URL.createObjectURL(
+      new Blob([data], { type: "application/pdf" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Orders_${new Date().toISOString().slice(0, 10)}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -87,6 +108,8 @@ export const useOrderStore = defineStore("orders", () => {
     submitCreateOrder,
     submitUpdateOrder,
     submitUpdateStatus,
+    softDeleteOrder,
     downloadExcel,
+    downloadPdf,
   };
 });

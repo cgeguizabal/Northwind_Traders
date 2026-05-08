@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
+import AppModal from "../components/common/AppModal.vue";
 import OrderTable from "../components/orders/OrderTable.vue";
 import OrderDetailModal from "../components/orders/OrderDetailModal.vue";
 import OrderFormModal from "../components/orders/OrderFormModal.vue";
@@ -11,7 +12,7 @@ import { useOrderStore } from "../stores/orderStore.js";
 import { useToast } from "vue-toastification";
 import { getOrderById } from "../axiosInstance/orderService.js";
 import { useRouter } from "vue-router";
-import { StatsReport, Plus, Printer } from "iconoir-vue/regular";
+import { StatsReport, Plus, Printer, Page } from "iconoir-vue/regular";
 
 const store = useOrderStore();
 const toast = useToast();
@@ -89,19 +90,17 @@ function sumBy(arr, keyGroup, keyVal) {
   }, {});
 }
 
-const countryOrderMap = computed(() =>
-  groupBy(filteredOrders.value, "shipCountry"),
-);
+const countryOrderMap = computed(() => groupBy(store.orders, "shipCountry"));
 const countryLabels = computed(() => Object.keys(countryOrderMap.value));
 const countryData = computed(() => Object.values(countryOrderMap.value));
 
 const revenueMap = computed(() =>
-  sumBy(filteredOrders.value, "shipCountry", "freight"),
+  sumBy(store.orders, "shipCountry", "freight"),
 );
 const revenueLabels = computed(() => Object.keys(revenueMap.value));
 const revenueData = computed(() => Object.values(revenueMap.value));
 
-const regionMap = computed(() => groupBy(filteredOrders.value, "shipRegion"));
+const regionMap = computed(() => groupBy(store.orders, "shipRegion"));
 const regionLabels = computed(() => Object.keys(regionMap.value));
 const regionData = computed(() => Object.values(regionMap.value));
 
@@ -157,9 +156,44 @@ async function exportExcel() {
   }
 }
 
+// ── PDF export (all orders) ────────────────────────────────────
+async function exportPdf() {
+  try {
+    await store.downloadPdf();
+  } catch {
+    toast.error("Failed to export PDF.");
+  }
+}
+
 // ── Print/PDF export (Reports tab) ────────────────────────────
 function printReport() {
   window.print();
+}
+
+// ── Soft delete (deactivate) ───────────────────────────────────
+const showDeleteConfirm = ref(false);
+const orderToDelete = ref(null);
+
+function promptDelete(order) {
+  orderToDelete.value = order;
+  showDeleteConfirm.value = true;
+}
+
+async function confirmDelete() {
+  try {
+    await store.softDeleteOrder(orderToDelete.value.orderId);
+    toast.success(`Order #${orderToDelete.value.orderId} deleted.`);
+  } catch {
+    toast.error("Failed to delete order.");
+  } finally {
+    showDeleteConfirm.value = false;
+    orderToDelete.value = null;
+  }
+}
+
+function cancelDelete() {
+  showDeleteConfirm.value = false;
+  orderToDelete.value = null;
 }
 
 onMounted(async () => {
@@ -179,6 +213,9 @@ onMounted(async () => {
         <div class="header-actions">
           <button class="btn btn-secondary btn-sm" @click="exportExcel">
             <StatsReport /> Export Excel
+          </button>
+          <button class="btn btn-secondary btn-sm" @click="exportPdf">
+            <Page /> Export PDF
           </button>
           <button
             class="btn btn-primary btn-sm"
@@ -208,7 +245,7 @@ onMounted(async () => {
       </div>
 
       <!-- Shared toolbar -->
-      <div class="toolbar">
+      <div v-if="activeTab === 'orders'" class="toolbar">
         <input
           v-model="filterYear"
           list="year-list"
@@ -239,19 +276,15 @@ onMounted(async () => {
 
       <!-- Tab: Orders Table -->
       <template v-else-if="activeTab === 'orders'">
-        <OrderTable :orders="filteredOrders" @row-click="openDetail" />
+        <OrderTable
+          :orders="filteredOrders"
+          @row-click="openDetail"
+          @deactivate="promptDelete"
+        />
       </template>
 
       <!-- Tab: Reports -->
       <template v-else>
-        <div class="reports-actions">
-          <button class="btn btn-secondary btn-sm" @click="exportExcel">
-            <StatsReport /> Export Excel
-          </button>
-          <button class="btn btn-secondary btn-sm" @click="printReport">
-            <Printer /> Print / Save PDF
-          </button>
-        </div>
         <div class="reports-charts">
           <BarChart
             :labels="countryLabels"
@@ -289,6 +322,24 @@ onMounted(async () => {
         @close="closeEdit"
         @saved="onSaved"
       />
+
+      <!-- Delete Confirmation Modal -->
+      <AppModal
+        v-if="showDeleteConfirm"
+        title="Delete Order"
+        width="420px"
+        @close="cancelDelete"
+      >
+        <p>Are you sure you want to delete this item?</p>
+        <template #footer>
+          <button class="btn btn-secondary" @click="cancelDelete">
+            Cancel
+          </button>
+          <button class="btn btn-danger" @click="confirmDelete">
+            Yes, delete
+          </button>
+        </template>
+      </AppModal>
     </div>
   </AppLayout>
 </template>
