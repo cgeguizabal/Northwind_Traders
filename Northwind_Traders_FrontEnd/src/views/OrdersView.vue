@@ -90,19 +90,17 @@ function sumBy(arr, keyGroup, keyVal) {
   }, {});
 }
 
-const countryOrderMap = computed(() =>
-  groupBy(filteredOrders.value, "shipCountry"),
-);
+const countryOrderMap = computed(() => groupBy(store.orders, "shipCountry"));
 const countryLabels = computed(() => Object.keys(countryOrderMap.value));
 const countryData = computed(() => Object.values(countryOrderMap.value));
 
 const revenueMap = computed(() =>
-  sumBy(filteredOrders.value, "shipCountry", "freight"),
+  sumBy(store.orders, "shipCountry", "freight"),
 );
 const revenueLabels = computed(() => Object.keys(revenueMap.value));
 const revenueData = computed(() => Object.values(revenueMap.value));
 
-const regionMap = computed(() => groupBy(filteredOrders.value, "shipRegion"));
+const regionMap = computed(() => groupBy(store.orders, "shipRegion"));
 const regionLabels = computed(() => Object.keys(regionMap.value));
 const regionData = computed(() => Object.values(regionMap.value));
 
@@ -247,7 +245,7 @@ onMounted(async () => {
       </div>
 
       <!-- Shared toolbar -->
-      <div class="toolbar">
+      <div v-if="activeTab === 'orders'" class="toolbar">
         <input
           v-model="filterYear"
           list="year-list"
