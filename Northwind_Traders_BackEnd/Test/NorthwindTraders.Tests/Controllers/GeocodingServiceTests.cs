@@ -148,7 +148,8 @@ public class GeocodingServiceTests
             OrderId     = 1,
             ShipAddress = "123 Main St",
             ShipCity    = "New York",
-            ShipCountry = "USA"
+            ShipCountry = "USA",
+            IsActive    = "Y"
         });
         await context.SaveChangesAsync();
 
