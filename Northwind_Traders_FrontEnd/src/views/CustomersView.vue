@@ -121,7 +121,9 @@ watch(search, () => {
           </button>
           <span class="pagination__info">
             Page {{ store.page }} of {{ store.totalPages }}
-            <span class="pagination__count">({{ store.totalCount }} customers)</span>
+            <span class="pagination__count"
+              >({{ store.totalCount }} customers)</span
+            >
           </span>
           <button
             class="btn btn-secondary btn-sm"

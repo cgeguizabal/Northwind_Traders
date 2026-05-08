@@ -1,5 +1,15 @@
 namespace NorthwindTraders.Application.DTOs.Customer;
 
+// Paged wrapper — used in GET /api/v1/customers
+public class PagedResult<T>
+{
+    public List<T> Items      { get; set; } = [];
+    public int     TotalCount { get; set; }
+    public int     Page       { get; set; }
+    public int     PageSize   { get; set; }
+    public int     TotalPages { get; set; }
+}
+
 // Summary — used in GET /api/v1/customers (list)
 public class CustomerSummaryDto
 {
