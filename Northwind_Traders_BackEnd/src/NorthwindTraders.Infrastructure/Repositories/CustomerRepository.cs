@@ -22,6 +22,43 @@ public class CustomerRepository : ICustomerRepository
             .ToListAsync();
     }
 
+    public async Task<(IReadOnlyList<Customer> Items, int TotalCount)> GetPagedAsync(
+        int page, int pageSize, string? search)
+    {
+        var query = _context.Customers.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var q = search.ToLower();
+            query = query.Where(c =>
+                (c.CompanyName  ?? "").ToLower().Contains(q) ||
+                (c.ContactName  ?? "").ToLower().Contains(q) ||
+                (c.City         ?? "").ToLower().Contains(q) ||
+                (c.Country      ?? "").ToLower().Contains(q));
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(c => c.CompanyName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new Customer
+            {
+                CustomerId   = c.CustomerId,
+                CompanyName  = c.CompanyName,
+                ContactName  = c.ContactName,
+                ContactTitle = c.ContactTitle,
+                City         = c.City,
+                Country      = c.Country,
+                Phone        = c.Phone,
+                Orders       = c.Orders.Where(o => o.IsActive == "Y").ToList()
+            })
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
     public async Task<Customer?> GetByIdAsync(string customerId)
     {
         return await _context.Customers

@@ -71,3 +71,21 @@
   padding: $spacing-xl;
   color: var(--text-muted);
 }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+
+  &__info {
+    font-size: $font-size-sm;
+    color: var(--text-muted);
+  }
+
+  &__count {
+    margin-left: $spacing-xs;
+    opacity: 0.7;
+  }
+}

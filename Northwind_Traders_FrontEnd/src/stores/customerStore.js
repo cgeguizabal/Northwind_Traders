@@ -3,18 +3,24 @@ import { ref } from 'vue'
 import { getAllCustomers, getCustomerById, getCustomerMapPins } from '../axiosInstance/customerService.js'
 
 export const useCustomerStore = defineStore('customers', () => {
-  const customers = ref([])
-  const current   = ref(null)
-  const mapPins   = ref([])
-  const loading   = ref(false)
-  const error     = ref(null)
+  const customers  = ref([])
+  const current    = ref(null)
+  const mapPins    = ref([])
+  const loading    = ref(false)
+  const error      = ref(null)
+  const page       = ref(1)
+  const totalPages = ref(1)
+  const totalCount = ref(0)
 
-  async function fetchCustomers() {
+  async function fetchCustomers(pageNum = 1, search = '') {
     loading.value = true
     error.value   = null
     try {
-      const { data } = await getAllCustomers()
-      customers.value = data
+      const { data } = await getAllCustomers(pageNum, 10, search)
+      customers.value = data.items
+      page.value       = data.page
+      totalPages.value = data.totalPages
+      totalCount.value = data.totalCount
     } catch (e) {
       error.value = e
       throw e
@@ -44,5 +50,5 @@ export const useCustomerStore = defineStore('customers', () => {
     return data
   }
 
-  return { customers, current, mapPins, loading, error, fetchCustomers, fetchCustomer, fetchMapPins }
+  return { customers, current, mapPins, loading, error, page, totalPages, totalCount, fetchCustomers, fetchCustomer, fetchMapPins }
 })
