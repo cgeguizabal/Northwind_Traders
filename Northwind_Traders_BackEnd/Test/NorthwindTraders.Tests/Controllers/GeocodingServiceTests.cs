@@ -5,6 +5,10 @@ using Moq;
 using Moq.Protected;
 using NorthwindTraders.Infrastructure.Services;
 using NorthwindTraders.Infrastructure.Persistence;
+using NorthwindTraders.Application.Interfaces;
+using NorthwindTraders.Domain.Common;
+using NorthwindTraders.Domain.Entities;
+using NorthwindTraders.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -15,12 +19,10 @@ public class GeocodingServiceTests
     // ── Builds a fake HttpClient that returns a scripted response ─
     private static HttpClient BuildHttpClient(string jsonResponse, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
-        // HttpMessageHandler is what HttpClient uses internally to send requests
-        // We mock it so no real HTTP call is made
         var handlerMock = new Mock<HttpMessageHandler>();
 
         handlerMock
-            .Protected() // access the protected SendAsync method
+            .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
@@ -34,16 +36,6 @@ public class GeocodingServiceTests
         return new HttpClient(handlerMock.Object);
     }
 
-    // ── Builds an EF Core in-memory DB ───────────────────────────
-    private static ApplicationDbContext BuildDbContext(string dbName)
-    {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(dbName) // no SQL Server needed
-            .Options;
-
-        return new ApplicationDbContext(options);
-    }
-
     // ── Builds a real IConfiguration with fake API key ───────────
     private static IConfiguration BuildConfiguration() =>
         new ConfigurationBuilder()
@@ -52,6 +44,17 @@ public class GeocodingServiceTests
                 ["GoogleMaps:ApiKey"] = "fake-api-key-for-testing"
             })
             .Build();
+
+    // ── Builds a mock IOrderRepository with optional seeded order ─
+    private static Mock<IOrderRepository> BuildOrderRepoMock(Order? order = null)
+    {
+        var mock = new Mock<IOrderRepository>();
+        mock.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(order);
+        mock.Setup(r => r.Update(It.IsAny<Order>()));
+        mock.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
+        return mock;
+    }
 
     // ── Sample Google Maps success response ──────────────────────
     private static string SuccessJson(double lat = 40.71, double lng = -74.00) => $$"""
@@ -69,7 +72,6 @@ public class GeocodingServiceTests
         }
         """;
 
-    // ── Google Maps ZERO_RESULTS response ────────────────────────
     private const string ZeroResultsJson = """
         {
             "status": "ZERO_RESULTS",
@@ -78,17 +80,15 @@ public class GeocodingServiceTests
         """;
 
     // ─────────────────────────────────────────────────────────────
-    // GeocodeAddressAsync — happy path
+    // GeocodeAddressAsync — tests go through GoogleMapsGeocodingService
     // ─────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task GeocodeAddressAsync_ReturnsSuccess_WhenGoogleRespondsOk()
     {
         // ARRANGE
-        var client  = BuildHttpClient(SuccessJson());
-        var context = BuildDbContext("geocode-success");
-        var config  = BuildConfiguration();
-        var service = new GeocodingService(client, config, context);
+        var apiService = new GoogleMapsGeocodingService(BuildHttpClient(SuccessJson()), BuildConfiguration());
+        var service    = new GeocodingService(apiService, BuildOrderRepoMock().Object);
 
         // ACT
         var result = await service.GeocodeAddressAsync("123 Main St, New York");
@@ -104,10 +104,8 @@ public class GeocodingServiceTests
     public async Task GeocodeAddressAsync_ReturnsFailure_WhenStatusIsZeroResults()
     {
         // ARRANGE
-        var client  = BuildHttpClient(ZeroResultsJson);
-        var context = BuildDbContext("geocode-zero");
-        var config  = BuildConfiguration();
-        var service = new GeocodingService(client, config, context);
+        var apiService = new GoogleMapsGeocodingService(BuildHttpClient(ZeroResultsJson), BuildConfiguration());
+        var service    = new GeocodingService(apiService, BuildOrderRepoMock().Object);
 
         // ACT
         var result = await service.GeocodeAddressAsync("NoWhere Land");
@@ -119,43 +117,43 @@ public class GeocodingServiceTests
 
     [Fact]
     public async Task GeocodeAddressAsync_ReturnsFailure_WhenHttpFails()
-{
-    // ARRANGE — Google returns 500
-    var client  = BuildHttpClient("{}", HttpStatusCode.InternalServerError);
-    var context = BuildDbContext("geocode-http-fail");
-    var config  = BuildConfiguration();
-    var service = new GeocodingService(client, config, context);
+    {
+        // ARRANGE — Google returns 500
+        var apiService = new GoogleMapsGeocodingService(BuildHttpClient("{}", HttpStatusCode.InternalServerError), BuildConfiguration());
+        var service    = new GeocodingService(apiService, BuildOrderRepoMock().Object);
 
-    // ACT
-    var result = await service.GeocodeAddressAsync("123 Main St");
+        // ACT
+        var result = await service.GeocodeAddressAsync("123 Main St");
 
-    // ASSERT
-    Assert.False(result.IsSuccess);
-    Assert.Contains("InternalServerError", result.Error); // ← enum name not number
-}
+        // ASSERT
+        Assert.False(result.IsSuccess);
+        Assert.Contains("InternalServerError", result.Error);
+    }
 
     // ─────────────────────────────────────────────────────────────
-    // GeocodeOrderAsync — happy path
-    // ────────────────────────────────────────��────────────────────
+    // GeocodeOrderAsync — uses mocked IGeocodingApiService + IOrderRepository
+    // ─────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task GeocodeOrderAsync_ReturnsSuccess_WhenOrderExists()
     {
-        // ARRANGE — seed an order into the in-memory DB
-        var context = BuildDbContext("geocode-order-success");
-        context.Orders.Add(new Domain.Entities.Order
+        // ARRANGE
+        var order = new Order
         {
             OrderId     = 1,
             ShipAddress = "123 Main St",
             ShipCity    = "New York",
             ShipCountry = "USA",
             IsActive    = "Y"
-        });
-        await context.SaveChangesAsync();
+        };
 
-        var client  = BuildHttpClient(SuccessJson());
-        var config  = BuildConfiguration();
-        var service = new GeocodingService(client, config, context);
+        var apiMock = new Mock<IGeocodingApiService>();
+        apiMock.Setup(a => a.GeocodeAddressAsync(It.IsAny<string>()))
+               .ReturnsAsync(Result<(string, decimal, decimal)>.Success(
+                   ("123 Main St, New York, NY 10001, USA", 40.71m, -74.00m)));
+
+        var repoMock = BuildOrderRepoMock(order);
+        var service  = new GeocodingService(apiMock.Object, repoMock.Object);
 
         // ACT
         var result = await service.GeocodeOrderAsync(1);
@@ -168,11 +166,10 @@ public class GeocodingServiceTests
     [Fact]
     public async Task GeocodeOrderAsync_ReturnsFailure_WhenOrderNotFound()
     {
-        // ARRANGE — empty DB, order 999 does not exist
-        var context = BuildDbContext("geocode-order-notfound");
-        var client  = BuildHttpClient(SuccessJson());
-        var config  = BuildConfiguration();
-        var service = new GeocodingService(client, config, context);
+        // ARRANGE — repo returns null for any id
+        var apiMock  = new Mock<IGeocodingApiService>();
+        var repoMock = BuildOrderRepoMock(null);
+        var service  = new GeocodingService(apiMock.Object, repoMock.Object);
 
         // ACT
         var result = await service.GeocodeOrderAsync(999);

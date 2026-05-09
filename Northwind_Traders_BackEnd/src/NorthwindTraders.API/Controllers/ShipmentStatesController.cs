@@ -20,14 +20,7 @@ public class ShipmentStatesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        try
-        {
-            var states = await _repository.GetAllAsync();
-            return Ok(states);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Unexpected error while retrieving shipment states: {ex.Message}");
-        }
+        var states = await _repository.GetAllAsync();
+        return Ok(states);
     }
 }

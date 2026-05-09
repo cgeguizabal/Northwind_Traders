@@ -10,7 +10,6 @@ import BarChart from "../components/charts/BarChart.vue";
 import DonutChart from "../components/charts/DonutChart.vue";
 import { useOrderStore } from "../stores/orderStore.js";
 import { useToast } from "vue-toastification";
-import { getOrderById } from "../axiosInstance/orderService.js";
 import { useRouter } from "vue-router";
 import { StatsReport, Plus, Printer, Page } from "iconoir-vue/regular";
 
@@ -105,26 +104,19 @@ const regionLabels = computed(() => Object.keys(regionMap.value));
 const regionData = computed(() => Object.values(regionMap.value));
 
 // ── Order detail modal ─────────────────────────────────────────
-const detailOrder = ref(null);
 const showDetail = ref(false);
-const detailLoading = ref(false);
 
 async function openDetail(order) {
-  detailLoading.value = true;
   try {
-    const { data } = await getOrderById(order.orderId);
-    detailOrder.value = data;
+    await store.fetchOrder(order.orderId);
     showDetail.value = true;
   } catch {
     toast.error("Failed to load order detail.");
-  } finally {
-    detailLoading.value = false;
   }
 }
 
 function closeDetail() {
   showDetail.value = false;
-  detailOrder.value = null;
 }
 
 // ── Edit modal ─────────────────────────────────────────────────
@@ -150,7 +142,15 @@ async function onSaved() {
 // ── Excel export ───────────────────────────────────────────────
 async function exportExcel() {
   try {
-    await store.downloadExcel();
+    const blob = await store.fetchExcelBlob();
+    const url = URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "orders.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } catch {
     toast.error("Failed to export Excel.");
   }
@@ -159,7 +159,17 @@ async function exportExcel() {
 // ── PDF export (all orders) ────────────────────────────────────
 async function exportPdf() {
   try {
-    await store.downloadPdf();
+    const blob = await store.fetchPdfBlob();
+    const url = URL.createObjectURL(
+      new Blob([blob], { type: "application/pdf" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Orders_${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } catch {
     toast.error("Failed to export PDF.");
   }
@@ -270,7 +280,7 @@ onMounted(async () => {
       </div>
 
       <!-- Loading -->
-      <div v-if="store.loading || detailLoading" class="orders-view__loading">
+      <div v-if="store.loading" class="orders-view__loading">
         <AppSpinner size="lg" />
       </div>
 
@@ -309,8 +319,8 @@ onMounted(async () => {
 
       <!-- Order Detail Modal -->
       <OrderDetailModal
-        v-if="showDetail && detailOrder"
-        :order="detailOrder"
+        v-if="showDetail && store.current"
+        :order="store.current"
         @close="closeDetail"
         @edit="openEdit"
       />
