@@ -142,7 +142,15 @@ async function onSaved() {
 // ── Excel export ───────────────────────────────────────────────
 async function exportExcel() {
   try {
-    await store.downloadExcel();
+    const blob = await store.fetchExcelBlob();
+    const url = URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "orders.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } catch {
     toast.error("Failed to export Excel.");
   }
@@ -151,7 +159,17 @@ async function exportExcel() {
 // ── PDF export (all orders) ────────────────────────────────────
 async function exportPdf() {
   try {
-    await store.downloadPdf();
+    const blob = await store.fetchPdfBlob();
+    const url = URL.createObjectURL(
+      new Blob([blob], { type: "application/pdf" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Orders_${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } catch {
     toast.error("Failed to export PDF.");
   }
