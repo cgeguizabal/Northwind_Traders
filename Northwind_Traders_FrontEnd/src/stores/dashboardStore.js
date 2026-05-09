@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { getDashboardStats } from "../axiosInstance/dashboardService.js";
 
 export const useDashboardStore = defineStore("dashboard", () => {
-  const stats = ref(null);     // aggregated KPIs from the API
+  const stats = ref(null); // aggregated KPIs from the API
   const loading = ref(false);
   const error = ref(null);
 

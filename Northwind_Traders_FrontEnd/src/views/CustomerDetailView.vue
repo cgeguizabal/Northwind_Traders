@@ -15,7 +15,7 @@ const router = useRouter();
 const store = useCustomerStore();
 const toast = useToast();
 
-const detailOrder = ref(null);  // full order loaded for the detail modal
+const detailOrder = ref(null); // full order loaded for the detail modal
 const showDetail = ref(false);
 const detailLoading = ref(false);
 

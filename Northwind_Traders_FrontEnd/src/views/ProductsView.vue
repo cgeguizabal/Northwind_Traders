@@ -10,7 +10,7 @@ import { useToast } from "vue-toastification";
 const store = useProductStore();
 const toast = useToast();
 const categories = ref([]);
-const selectedCat = ref("");  // empty = 'All Categories'
+const selectedCat = ref(""); // empty = 'All Categories'
 
 onMounted(async () => {
   try {

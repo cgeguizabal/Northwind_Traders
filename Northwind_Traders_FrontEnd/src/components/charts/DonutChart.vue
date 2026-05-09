@@ -48,7 +48,7 @@ const options = {
       },
     },
   },
-  cutout: "60%",  // size of the center hole
+  cutout: "60%", // size of the center hole
 };
 </script>
 

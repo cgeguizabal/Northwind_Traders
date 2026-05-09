@@ -1,13 +1,13 @@
 <script setup>
 // Thin wrapper around AppModal that renders a confirm/cancel action pair
-import AppModal from './AppModal.vue'
+import AppModal from "./AppModal.vue";
 
 defineProps({
-  title:   { type: String, default: 'Confirm' },
-  message: { type: String, default: 'Are you sure?' },
-})
+  title: { type: String, default: "Confirm" },
+  message: { type: String, default: "Are you sure?" },
+});
 
-const emit = defineEmits(['confirm', 'cancel'])
+const emit = defineEmits(["confirm", "cancel"]);
 </script>
 
 <template>
@@ -16,9 +16,13 @@ const emit = defineEmits(['confirm', 'cancel'])
 
     <template #footer>
       <button class="btn btn-secondary" @click="$emit('cancel')">Cancel</button>
-      <button class="btn btn-danger"    @click="$emit('confirm')">Confirm</button>
+      <button class="btn btn-danger" @click="$emit('confirm')">Confirm</button>
     </template>
   </AppModal>
 </template>
 
-<style lang="scss" src="../../assets/styles/Components/ConfirmDialog.scss" scoped></style>
+<style
+  lang="scss"
+  src="../../assets/styles/Components/ConfirmDialog.scss"
+  scoped
+></style>

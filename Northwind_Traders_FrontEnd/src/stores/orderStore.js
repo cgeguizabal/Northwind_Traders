@@ -13,8 +13,8 @@ import {
 } from "../axiosInstance/orderService.js";
 
 export const useOrderStore = defineStore("orders", () => {
-  const orders = ref([]);     // flat list used by the orders table
-  const current = ref(null);  // single order loaded for the detail modal
+  const orders = ref([]); // flat list used by the orders table
+  const current = ref(null); // single order loaded for the detail modal
   const loading = ref(false);
   const error = ref(null);
 

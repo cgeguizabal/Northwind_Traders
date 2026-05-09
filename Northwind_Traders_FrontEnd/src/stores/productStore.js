@@ -6,7 +6,7 @@ import {
 } from "../axiosInstance/productService.js";
 
 export const useProductStore = defineStore("products", () => {
-  const products = ref([]);   // active product list (or filtered by category)
+  const products = ref([]); // active product list (or filtered by category)
   const loading = ref(false);
   const error = ref(null);
 

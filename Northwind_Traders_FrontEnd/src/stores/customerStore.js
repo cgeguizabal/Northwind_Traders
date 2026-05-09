@@ -7,9 +7,9 @@ import {
 } from "../axiosInstance/customerService.js";
 
 export const useCustomerStore = defineStore("customers", () => {
-  const customers = ref([]);   // current page of customers
-  const current = ref(null);   // single customer loaded for the detail view
-  const mapPins = ref([]);     // geocoded order locations for the map tab
+  const customers = ref([]); // current page of customers
+  const current = ref(null); // single customer loaded for the detail view
+  const mapPins = ref([]); // geocoded order locations for the map tab
   const loading = ref(false);
   const error = ref(null);
   const page = ref(1);
