@@ -19,7 +19,7 @@ const toast = useToast();
 const store = useOrderStore();
 const productStore = useProductStore();
 
-// ── Dropdown data ─────────────────────────────────────────────
+// ── Dropdown data — loaded in onMounted ─────────────────────
 const statuses = ref([]);
 const loading = ref(false);
 const saving = ref(false);
@@ -37,6 +37,7 @@ function buildAddressString(addr, city, region, postalCode, country) {
   return [addr, city, region, postalCode, country].filter(Boolean).join(", ");
 }
 
+// Lazy-load Google Maps SDK only when needed; reuses window.google if already loaded
 function loadGoogleMaps() {
   return new Promise((resolve) => {
     if (window.google?.maps) {

@@ -15,7 +15,7 @@ const router = useRouter();
 const store = useCustomerStore();
 const toast = useToast();
 
-const detailOrder = ref(null);
+const detailOrder = ref(null);  // full order loaded for the detail modal
 const showDetail = ref(false);
 const detailLoading = ref(false);
 
@@ -27,6 +27,7 @@ onMounted(async () => {
   }
 });
 
+// Load the full order detail (with lines) when the user clicks a row in the orders table
 async function openOrder(order) {
   detailLoading.value = true;
   try {

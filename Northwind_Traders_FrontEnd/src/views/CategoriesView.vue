@@ -20,6 +20,7 @@ const COLORS = [
   "#14b8a6",
   "#f97316",
 ];
+// Assign stable colors to category cards by cycling through the palette with modulo
 function catColor(id) {
   return COLORS[(id - 1) % COLORS.length];
 }

@@ -15,6 +15,7 @@ const CATEGORY_COLORS = [
   "#f97316",
 ];
 
+// Cycle through the palette using modulo so every category gets a stable color
 function categoryColor(id) {
   return CATEGORY_COLORS[(id - 1) % CATEGORY_COLORS.length];
 }

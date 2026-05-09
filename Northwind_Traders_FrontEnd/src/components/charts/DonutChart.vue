@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { Doughnut } from "vue-chartjs";
+// Register only the Chart.js elements this component needs (tree-shaking friendly)
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -42,11 +43,12 @@ const options = {
     },
     tooltip: {
       callbacks: {
+        // Prepend a space so the label doesn't run into the value
         label: (ctx) => ` ${ctx.label}: ${ctx.parsed}`,
       },
     },
   },
-  cutout: "60%",
+  cutout: "60%",  // size of the center hole
 };
 </script>
 

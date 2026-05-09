@@ -1,4 +1,5 @@
 <script setup>
+// Thin wrapper around AppModal that renders a confirm/cancel action pair
 import AppModal from './AppModal.vue'
 
 defineProps({

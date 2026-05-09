@@ -10,10 +10,11 @@ import { useToast } from "vue-toastification";
 const store = useProductStore();
 const toast = useToast();
 const categories = ref([]);
-const selectedCat = ref("");
+const selectedCat = ref("");  // empty = 'All Categories'
 
 onMounted(async () => {
   try {
+    // Fetch categories and products in parallel to reduce wait time
     const [cats] = await Promise.all([
       getAllCategories(),
       store.fetchProducts(),

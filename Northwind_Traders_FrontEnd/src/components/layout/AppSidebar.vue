@@ -28,6 +28,7 @@ const route = useRoute();
 
 const showLogoutDialog = ref(false);
 
+// navItems is computed so the Employees link is conditionally included for managers
 const navItems = computed(() => [
   { label: "Dashboard", icon: Home, path: "/dashboard" },
   { label: "Orders", icon: Package, path: "/orders" },

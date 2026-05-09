@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { getAllEmployees, getEmployeeById, updateEmployee } from '../axiosInstance/employeeService.js'
 
 export const useEmployeeStore = defineStore('employees', () => {
-  const employees = ref([])
-  const current   = ref(null)
+  const employees = ref([])   // full employee list
+  const current   = ref(null) // single employee for detail/edit
   const loading   = ref(false)
   const error     = ref(null)
 

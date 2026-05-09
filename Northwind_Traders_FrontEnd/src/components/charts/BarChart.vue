@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { Bar } from "vue-chartjs";
+// Register only the Chart.js elements this component needs (tree-shaking friendly)
 import {
   Chart as ChartJS,
   BarElement,

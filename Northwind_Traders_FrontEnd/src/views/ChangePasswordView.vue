@@ -13,9 +13,10 @@ const toast = useToast();
 const form = reactive({ newPassword: "", confirmPassword: "" });
 const errors = reactive({ newPassword: "", confirmPassword: "" });
 const loading = ref(false);
-const showNew = ref(false);
-const showConfirm = ref(false);
+const showNew = ref(false);      // toggle new-password visibility
+const showConfirm = ref(false);  // toggle confirm-password visibility
 
+// Client-side validation before sending the request
 function validate() {
   errors.newPassword = "";
   errors.confirmPassword = "";

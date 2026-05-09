@@ -13,8 +13,9 @@ const toast = useToast();
 const form = reactive({ email: "", password: "" });
 const errors = reactive({ email: "", password: "" });
 const loading = ref(false);
-const showPassword = ref(false);
+const showPassword = ref(false); // toggles between input type='password' and type='text'
 
+// Client-side validation before sending the request
 function validate() {
   errors.email = "";
   errors.password = "";
@@ -41,6 +42,7 @@ async function submit() {
   loading.value = true;
   try {
     await auth.loginUser({ email: form.email, password: form.password });
+    // Redirect to change-password if the employee must set a new one first
     if (auth.mustChangePassword) {
       router.push("/change-password");
     } else {

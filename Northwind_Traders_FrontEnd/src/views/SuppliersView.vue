@@ -1,4 +1,5 @@
 <script setup>
+// Read-only list of product suppliers. Responsive: table on desktop, cards on mobile.
 import { ref, onMounted } from "vue";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";

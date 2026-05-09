@@ -13,8 +13,8 @@ import {
 } from "../axiosInstance/orderService.js";
 
 export const useOrderStore = defineStore("orders", () => {
-  const orders = ref([]);
-  const current = ref(null);
+  const orders = ref([]);     // flat list used by the orders table
+  const current = ref(null);  // single order loaded for the detail modal
   const loading = ref(false);
   const error = ref(null);
 
@@ -47,6 +47,7 @@ export const useOrderStore = defineStore("orders", () => {
     }
   }
 
+  // Creates the order, then silently geocodes its addresses in the background
   async function submitCreateOrder(payload) {
     const { data } = await createOrder(payload);
 
@@ -67,16 +68,19 @@ export const useOrderStore = defineStore("orders", () => {
     await updateOrderStatus(id, statusId);
   }
 
+  // Soft-deletes by deactivating on the server, then removes from local list
   async function softDeleteOrder(id) {
     await deactivateOrder(id);
     orders.value = orders.value.filter((o) => o.orderId !== id);
   }
 
+  // Returns the raw Blob — caller is responsible for creating and revoking the URL
   async function fetchExcelBlob() {
     const { data } = await exportOrdersExcel();
     return data;
   }
 
+  // Returns the raw Blob — caller is responsible for creating and revoking the URL
   async function fetchPdfBlob() {
     const { data } = await exportOrdersPdf();
     return data;

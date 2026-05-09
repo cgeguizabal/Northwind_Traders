@@ -1,4 +1,5 @@
 <script setup>
+// Read-only list of shipping companies with total order count.
 import { ref, onMounted } from "vue";
 import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";

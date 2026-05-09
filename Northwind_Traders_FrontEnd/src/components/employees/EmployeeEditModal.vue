@@ -15,6 +15,7 @@ const store = useEmployeeStore();
 
 const saving = ref(false);
 
+// Allowed job titles — only these four are valid in this system
 const TITLE_OPTIONS = [
   "Sales Representative",
   "Inside Sales Coordinator",
@@ -22,6 +23,7 @@ const TITLE_OPTIONS = [
   "Vice President, Sales",
 ];
 
+// Pre-populate the form from the prop so edits start from current values
 const form = reactive({
   title: props.employee.title || "",
   titleOfCourtesy: props.employee.titleOfCourtesy || "",

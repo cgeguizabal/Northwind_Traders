@@ -1,4 +1,6 @@
 <script setup>
+// Root shell: sidebar + header + main content slot.
+// ui.sidebarOpen drives both the sidebar visibility and the mobile overlay.
 import AppSidebar from './AppSidebar.vue'
 import AppHeader  from './AppHeader.vue'
 import { useUiStore } from '../../stores/uiStore.js'
