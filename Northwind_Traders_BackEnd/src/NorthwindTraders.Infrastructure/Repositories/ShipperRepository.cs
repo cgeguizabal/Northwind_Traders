@@ -31,17 +31,4 @@ public class ShipperRepository : IShipperRepository
                 .ThenInclude(o => o.ShipmentState)
             .FirstOrDefaultAsync(s => s.ShipperId == id);
     }
-
-    // Read-only — required by IRepository<T> but never used
-    public async Task AddAsync(Shipper shipper)
-        => await _context.Shippers.AddAsync(shipper);
-
-    public void Update(Shipper shipper)
-        => _context.Shippers.Update(shipper);
-
-    public void Delete(Shipper shipper)
-        => _context.Shippers.Remove(shipper);
-
-    public async Task<int> SaveChangesAsync()
-        => await _context.SaveChangesAsync();
 }

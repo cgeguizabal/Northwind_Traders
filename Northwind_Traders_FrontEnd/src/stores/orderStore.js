@@ -72,30 +72,14 @@ export const useOrderStore = defineStore("orders", () => {
     orders.value = orders.value.filter((o) => o.orderId !== id);
   }
 
-  async function downloadExcel() {
+  async function fetchExcelBlob() {
     const { data } = await exportOrdersExcel();
-    const url = URL.createObjectURL(new Blob([data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "orders.xlsx";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    return data;
   }
 
-  async function downloadPdf() {
+  async function fetchPdfBlob() {
     const { data } = await exportOrdersPdf();
-    const url = URL.createObjectURL(
-      new Blob([data], { type: "application/pdf" }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Orders_${new Date().toISOString().slice(0, 10)}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    return data;
   }
 
   return {
@@ -109,7 +93,7 @@ export const useOrderStore = defineStore("orders", () => {
     submitUpdateOrder,
     submitUpdateStatus,
     softDeleteOrder,
-    downloadExcel,
-    downloadPdf,
+    fetchExcelBlob,
+    fetchPdfBlob,
   };
 });

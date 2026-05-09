@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NorthwindTraders.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc49b7a329d2cbf3fbeb1961ca85b13e958159ad")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+54589570dab501ed09d24d8703deb16298d82cc1")]
 [assembly: System.Reflection.AssemblyProductAttribute("NorthwindTraders.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NorthwindTraders.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
