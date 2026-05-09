@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./Northwind_Traders_BackEnd
+      dockerfile: Dockerfile
+    ports:
+      - "5272:5272"
+    environment:
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - Jwt__Key=${JWT_KEY}
+      - GoogleMaps__ApiKey=${GOOGLE_MAPS_API_KEY}
+      - AllowedOrigins__0=http://localhost
+      - ASPNETCORE_ENVIRONMENT=Production
+
+  frontend:
+    build:
+      context: ./Northwind_Traders_FrontEnd
+      dockerfile: Dockerfile
+      args:
+        - VITE_GOOGLE_MAPS_KEY=${GOOGLE_MAPS_API_KEY}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

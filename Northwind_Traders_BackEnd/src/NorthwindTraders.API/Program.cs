@@ -1,12 +1,13 @@
 using System.Text;                                              // C# built in
 using Microsoft.AspNetCore.Authentication.JwtBearer;           // JWT package
+using NorthwindTraders.API.Middleware;
+using NorthwindTraders.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;                          // JWT package
 using NorthwindTraders.Domain.Interfaces;
 using NorthwindTraders.Infrastructure.Persistence;
 using NorthwindTraders.Infrastructure.Repositories;
 using NorthwindTraders.Infrastructure.Services;
-using NorthwindTraders.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,8 @@ builder.Services.AddScoped<IShipmentStateRepository, ShipmentStateRepository>();
 
 // ── SERVICES ──────────────────────────────────────────────────────────────────
 // AddScoped — JwtService needs IConfiguration which is a singleton, scoped is fine here
-builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
+builder.Services.AddHttpClient<IGeocodingApiService, GoogleMapsGeocodingService>();
+builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
@@ -107,6 +109,9 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // ── MIDDLEWARE PIPELINE ───────────────────────────────────────────────────────
+// Must be first — wraps all subsequent middleware so any unhandled exception is caught here
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

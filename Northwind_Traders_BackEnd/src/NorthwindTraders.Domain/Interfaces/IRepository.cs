@@ -8,20 +8,8 @@ namespace NorthwindTraders.Domain.Interfaces;
 // Abstracts all data access behind an interface
 // Application never talks to the database directly
 
-public interface IRepository<T> where T : class
+public interface IRepository<T> : IReadOnlyRepository<T> where T : class
 {
-   // ── READ ──────────────────────────────────────────────
-
-    // Get a single entity by its primary key
-    // Task = async operation (database calls are always async)
-    // T? = might return null if not found
-    Task<T?> GetByIdAsync(int id);
-
-    // Get all entities of this type
-    // IReadOnlyList = you get back a list you can read but not modify
-    // This is intentional — you don't modify DB data through a list
-    Task<IReadOnlyList<T>> GetAllAsync();
-
     // ── WRITE ─────────────────────────────────────────────
 
     // Add a new entity to the database

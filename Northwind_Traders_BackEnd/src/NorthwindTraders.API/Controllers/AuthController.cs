@@ -24,35 +24,28 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequestDto request)
     {
-        try
+        var employee = await _employeeRepository.GetByEmailAsync(request.Email);
+        if (employee is null)
+            return Unauthorized("Invalid email or password.");
+
+        var passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, employee.PasswordHash);
+        if (!passwordValid)
+            return Unauthorized("Invalid email or password.");
+
+        var token      = _jwtService.GenerateToken(employee);
+        var expiryMins = int.Parse(HttpContext.RequestServices
+                            .GetRequiredService<IConfiguration>()["Jwt:ExpiryMinutes"]!);
+
+        var response = new LoginResponseDto
         {
-            var employee = await _employeeRepository.GetByEmailAsync(request.Email);
-            if (employee is null)
-                return Unauthorized("Invalid email or password.");
+            Token               = token,
+            Email               = employee.Email!,
+            FullName            = $"{employee.FirstName} {employee.LastName}",
+            ExpiresAt           = DateTime.UtcNow.AddMinutes(expiryMins),
+            MustChangePassword  = employee.MustChangePassword
+        };
 
-            var passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, employee.PasswordHash);
-            if (!passwordValid)
-                return Unauthorized("Invalid email or password.");
-
-            var token      = _jwtService.GenerateToken(employee);
-            var expiryMins = int.Parse(HttpContext.RequestServices
-                                .GetRequiredService<IConfiguration>()["Jwt:ExpiryMinutes"]!);
-
-            var response = new LoginResponseDto
-            {
-                Token               = token,
-                Email               = employee.Email!,
-                FullName            = $"{employee.FirstName} {employee.LastName}",
-                ExpiresAt           = DateTime.UtcNow.AddMinutes(expiryMins),
-                MustChangePassword  = employee.MustChangePassword
-            };
-
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An unexpected error occurred during login: {ex.Message}");
-        }
+        return Ok(response);
     }
 
     // POST api/v1/auth/change-password
@@ -60,37 +53,30 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
     {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(request.NewPassword))
-                return BadRequest("New password is required.");
+        if (string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest("New password is required.");
 
-            if (request.NewPassword.Length < 8)
-                return BadRequest("Password must be at least 8 characters.");
+        if (request.NewPassword.Length < 8)
+            return BadRequest("Password must be at least 8 characters.");
 
-            if (request.NewPassword != request.ConfirmPassword)
-                return BadRequest("Passwords do not match.");
+        if (request.NewPassword != request.ConfirmPassword)
+            return BadRequest("Passwords do not match.");
 
-            var employeeIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                  ?? User.FindFirst("nameid")?.Value;
+        var employeeIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                              ?? User.FindFirst("nameid")?.Value;
 
-            if (employeeIdClaim is null || !int.TryParse(employeeIdClaim, out int employeeId))
-                return Unauthorized("Invalid token.");
+        if (employeeIdClaim is null || !int.TryParse(employeeIdClaim, out int employeeId))
+            return Unauthorized("Invalid token.");
 
-            var employee = await _employeeRepository.GetByIdAsync(employeeId);
-            if (employee is null)
-                return NotFound("Employee not found.");
+        var employee = await _employeeRepository.GetByIdAsync(employeeId);
+        if (employee is null)
+            return NotFound("Employee not found.");
 
-            employee.PasswordHash      = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-            employee.MustChangePassword = false;
-            _employeeRepository.Update(employee);
-            await _employeeRepository.SaveChangesAsync();
+        employee.PasswordHash      = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        employee.MustChangePassword = false;
+        _employeeRepository.Update(employee);
+        await _employeeRepository.SaveChangesAsync();
 
-            return Ok(new { message = "Password changed successfully." });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An unexpected error occurred: {ex.Message}");
-        }
+        return Ok(new { message = "Password changed successfully." });
     }
 }

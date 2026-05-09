@@ -5,24 +5,23 @@ import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
 import { useToast } from "vue-toastification";
 import { getAllCustomers } from "../axiosInstance/customerService.js";
-import { getAllEmployees } from "../axiosInstance/employeeService.js";
 import { getAllShippers } from "../axiosInstance/shipperService.js";
 import { getAllShipmentStates } from "../axiosInstance/shipmentStateService.js";
-import { getActiveProducts } from "../axiosInstance/productService.js";
 import { useOrderStore } from "../stores/orderStore.js";
+import { useEmployeeStore } from "../stores/employeeStore.js";
+import { useProductStore } from "../stores/productStore.js";
 import { validateAddress } from "../axiosInstance/geocodingService.js";
 import { Xmark, MapPin, CheckCircle, WarningCircle } from "iconoir-vue/regular";
 
 const router = useRouter();
 const toast = useToast();
 const store = useOrderStore();
+const employeeStore = useEmployeeStore();
+const productStore = useProductStore();
 
-// ── Dropdown data ──────────────────────────────────────────────
-const customers = ref([]);
-const employees = ref([]);
+// ── Dropdown data ─────────────────────────────────────────────
 const shippers = ref([]);
 const statuses = ref([]);
-const products = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 
@@ -190,26 +189,43 @@ const newLine = reactive({
 });
 
 const filteredProducts = computed(() =>
-  products.value.filter((p) =>
+  productStore.products.filter((p) =>
     p.productName.toLowerCase().startsWith(productSearch.value.toLowerCase()),
   ),
 );
 
 const customerSearch = ref("");
-const filteredCustomers = computed(() =>
-  customers.value.filter((c) =>
-    (c.companyName || "")
-      .toLowerCase()
-      .startsWith(customerSearch.value.toLowerCase()),
-  ),
-);
+const customerResults = ref([]);
+const customerLoading = ref(false);
+let customerDebounce;
+
+async function searchCustomers(q) {
+  clearTimeout(customerDebounce);
+  if (!q) {
+    customerResults.value = [];
+    return;
+  }
+  customerDebounce = setTimeout(async () => {
+    customerLoading.value = true;
+    try {
+      const { data } = await getAllCustomers(1, 10, q);
+      customerResults.value = data.items;
+    } catch {
+      /* ignore */
+    } finally {
+      customerLoading.value = false;
+    }
+  }, 300);
+}
 
 function addLine() {
   if (!newLine.productId || newLine.quantity <= 0) {
     toast.warning("Select a product and enter a valid quantity.");
     return;
   }
-  const product = products.value.find((p) => p.productId === newLine.productId);
+  const product = productStore.products.find(
+    (p) => p.productId === newLine.productId,
+  );
   form.lines.push({
     productId: newLine.productId,
     productName: product?.productName || "",
@@ -295,18 +311,14 @@ function formatCurrency(n) {
 onMounted(async () => {
   loading.value = true;
   try {
-    const [c, e, sh, st, p] = await Promise.all([
-      getAllCustomers(),
-      getAllEmployees(),
+    const [sh, st] = await Promise.all([
       getAllShippers(),
       getAllShipmentStates(),
-      getActiveProducts(),
+      employeeStore.fetchEmployees(),
+      productStore.fetchProducts(),
     ]);
-    customers.value = c.data;
-    employees.value = e.data;
     shippers.value = sh.data;
     statuses.value = st.data;
-    products.value = p.data;
     // Pre-fill today's date
     form.orderDate = new Date().toISOString().split("T")[0];
   } catch {
@@ -350,10 +362,11 @@ onMounted(async () => {
               v-model="customerSearch"
               list="customer-list"
               class="form-control"
-              placeholder="Search customer..."
+              placeholder="Type to search customer..."
+              @input="searchCustomers(customerSearch)"
               @change="
                 (e) => {
-                  const m = customers.find(
+                  const m = customerResults.find(
                     (c) => c.companyName === e.target.value,
                   );
                   if (m) {
@@ -367,11 +380,12 @@ onMounted(async () => {
             />
             <datalist id="customer-list">
               <option
-                v-for="c in filteredCustomers"
+                v-for="c in customerResults"
                 :key="c.customerId"
                 :value="c.companyName"
               />
             </datalist>
+            <span v-if="customerLoading" class="form-hint">Searching...</span>
             <span v-if="errors.customerId" class="form-error">{{
               errors.customerId
             }}</span>
@@ -381,7 +395,7 @@ onMounted(async () => {
             <select v-model="form.employeeId" class="form-control">
               <option value="">Select employee...</option>
               <option
-                v-for="e in employees"
+                v-for="e in employeeStore.employees"
                 :key="e.employeeId"
                 :value="e.employeeId"
               >
@@ -631,7 +645,7 @@ onMounted(async () => {
               placeholder="Search product..."
               @change="
                 (e) => {
-                  const m = products.find(
+                  const m = productStore.products.find(
                     (p) => p.productName === e.target.value,
                   );
                   if (m) {
