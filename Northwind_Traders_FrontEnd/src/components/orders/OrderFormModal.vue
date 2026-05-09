@@ -4,7 +4,7 @@ import AppModal from "../common/AppModal.vue";
 import AppSpinner from "../common/AppSpinner.vue";
 import { useToast } from "vue-toastification";
 import { getAllShipmentStates } from "../../axiosInstance/shipmentStateService.js";
-import { getActiveProducts } from "../../axiosInstance/productService.js";
+import { getAllProducts } from "../../axiosInstance/productService.js";
 import { Xmark, MapPin, CheckCircle, WarningCircle } from "iconoir-vue/regular";
 import { useOrderStore } from "../../stores/orderStore.js";
 import { validateAddress } from "../../axiosInstance/geocodingService.js";
@@ -302,7 +302,7 @@ onMounted(async () => {
   try {
     const [st, p] = await Promise.all([
       getAllShipmentStates(),
-      getActiveProducts(),
+      getAllProducts(),
     ]);
     statuses.value = st.data;
     products.value = p.data;

@@ -8,7 +8,7 @@ import { getAllCustomers } from "../axiosInstance/customerService.js";
 import { getAllEmployees } from "../axiosInstance/employeeService.js";
 import { getAllShippers } from "../axiosInstance/shipperService.js";
 import { getAllShipmentStates } from "../axiosInstance/shipmentStateService.js";
-import { getActiveProducts } from "../axiosInstance/productService.js";
+import { getAllProducts } from "../axiosInstance/productService.js";
 import { useOrderStore } from "../stores/orderStore.js";
 import { validateAddress } from "../axiosInstance/geocodingService.js";
 import { Xmark, MapPin, CheckCircle, WarningCircle } from "iconoir-vue/regular";
@@ -313,7 +313,7 @@ onMounted(async () => {
       getAllEmployees(),
       getAllShippers(),
       getAllShipmentStates(),
-      getActiveProducts(),
+      getAllProducts(),
     ]);
     employees.value = e.data;
     shippers.value = sh.data;
