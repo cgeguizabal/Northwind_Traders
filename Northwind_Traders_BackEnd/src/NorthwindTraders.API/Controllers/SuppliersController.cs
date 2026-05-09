@@ -5,6 +5,8 @@ using NorthwindTraders.Domain.Interfaces;
 
 namespace NorthwindTraders.API.Controllers;
 
+// Read-only endpoints for product suppliers.
+// Returns supplier details and the products they supply.
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
@@ -17,7 +19,7 @@ public class SuppliersController : ControllerBase
         _repository = repository;
     }
 
-    // GET api/v1/suppliers
+    // GET api/v1/suppliers — returns all suppliers with their product count
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -38,7 +40,7 @@ public class SuppliersController : ControllerBase
         return Ok(dtos);
     }
 
-    // GET api/v1/suppliers/5
+    // GET api/v1/suppliers/{id} — returns a single supplier with the full product list
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {

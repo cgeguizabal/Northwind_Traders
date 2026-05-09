@@ -3,6 +3,9 @@ using System.Text.Json;
 
 namespace NorthwindTraders.API.Middleware;
 
+// ASP.NET Core middleware that catches any unhandled exception in the pipeline
+// and returns a structured JSON error response instead of a raw 500 HTML page.
+// Registered in Program.cs with app.UseMiddleware<GlobalExceptionHandlingMiddleware>().
 public class GlobalExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
@@ -16,6 +19,7 @@ public class GlobalExceptionHandlingMiddleware
         _logger = logger;
     }
 
+    // Called for every HTTP request — passes control to the next middleware in the pipeline
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -33,6 +37,7 @@ public class GlobalExceptionHandlingMiddleware
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        // Switch expression \u2014 maps known exception types to appropriate HTTP status codes
         var (statusCode, message) = exception switch
         {
             KeyNotFoundException       => (HttpStatusCode.NotFound,            "The requested resource was not found."),
@@ -44,6 +49,7 @@ public class GlobalExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode  = (int)statusCode;
 
+        // traceId \u2014 links this response to the server log entry for easier debugging
         var body = JsonSerializer.Serialize(new
         {
             statusCode = (int)statusCode,

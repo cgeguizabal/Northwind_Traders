@@ -1,6 +1,6 @@
 namespace NorthwindTraders.Domain.Entities;
 
-
+/// Shipping company responsible for delivering orders. Maps to dbo.Shippers.
 public class Shipper
 {
     /// Primary key for shipper.

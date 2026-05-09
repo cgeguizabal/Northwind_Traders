@@ -1,5 +1,6 @@
 namespace NorthwindTraders.Domain.Entities;
 
+/// Lookup table for order shipment states (e.g. Pending, Shipped, Completed, Cancelled).
 public class ShipmentState
 {
     /// Primary key for shipment state.

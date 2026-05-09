@@ -1,6 +1,6 @@
 namespace NorthwindTraders.Domain.Entities;
 
-
+/// Company that supplies products to Northwind Traders. Maps to dbo.Suppliers.
 public class Supplier
 {
     /// Primary key for supplier.

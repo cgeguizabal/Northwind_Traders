@@ -4,6 +4,8 @@ using NorthwindTraders.Domain.Interfaces;
 
 namespace NorthwindTraders.API.Controllers;
 
+// Exposes address validation via the Google Maps Geocoding API.
+// Takes a free-form address string and returns coordinates + a normalized address.
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
@@ -37,5 +39,6 @@ public class GeocodingController : ControllerBase
         });
     }
 
+    // record \u2014 C# positional record: a lightweight immutable class used as a request body
     public record ValidateAddressRequest(string Address);
 }

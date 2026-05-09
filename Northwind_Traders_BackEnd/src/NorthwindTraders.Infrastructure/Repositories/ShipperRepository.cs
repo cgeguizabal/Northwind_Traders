@@ -17,7 +17,7 @@ public class ShipperRepository : IShipperRepository
     public async Task<IReadOnlyList<Shipper>> GetAllAsync()
     {
         return await _context.Shippers
-            .Include(s => s.Orders)
+            .Include(s => s.Orders)   // load orders so the controller can count them
             .OrderBy(s => s.CompanyName)
             .ToListAsync();
     }
@@ -26,9 +26,9 @@ public class ShipperRepository : IShipperRepository
     {
         return await _context.Shippers
             .Include(s => s.Orders)
-                .ThenInclude(o => o.Customer)
+                .ThenInclude(o => o.Customer)        // needed for order history display
             .Include(s => s.Orders)
-                .ThenInclude(o => o.ShipmentState)
+                .ThenInclude(o => o.ShipmentState)   // needed for shipment status display
             .FirstOrDefaultAsync(s => s.ShipperId == id);
     }
 }

@@ -5,6 +5,8 @@ using NorthwindTraders.Domain.Interfaces;
 
 namespace NorthwindTraders.API.Controllers;
 
+// Read-only endpoints for product categories.
+// Categories are never created or deleted through the API.
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
@@ -17,12 +19,13 @@ public class CategoriesController : ControllerBase
         _repository = repository;
     }
 
-    // GET api/v1/categories
+    // GET api/v1/categories — returns all categories with product count
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var categories = await _repository.GetAllAsync();
 
+        // Map to summary DTO — product list is omitted here to keep responses lightweight
         var dtos = categories.Select(c => new CategorySummaryDto
         {
             CategoryId    = c.CategoryId,
@@ -34,7 +37,7 @@ public class CategoriesController : ControllerBase
         return Ok(dtos);
     }
 
-    // GET api/v1/categories/1
+    // GET api/v1/categories/{id} — returns a single category with its full product list
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {

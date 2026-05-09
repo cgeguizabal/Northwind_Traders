@@ -17,8 +17,8 @@ public class ProductRepository : IProductRepository
     public async Task<IReadOnlyList<Product>> GetAllAsync()
     {
         return await _context.Products
-            .Include(p => p.Category)
-            .Include(p => p.Supplier)
+            .Include(p => p.Category)   // load category name for display
+            .Include(p => p.Supplier)   // load supplier name for display
             .OrderBy(p => p.ProductName)
             .ToListAsync();
     }
@@ -41,6 +41,8 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
     }
 
+    // Returns only products where Discontinued = false
+    // Used in the new-order form so discontinued items cannot be added
     public async Task<IReadOnlyList<Product>> GetActiveProductsAsync()
     {
         return await _context.Products

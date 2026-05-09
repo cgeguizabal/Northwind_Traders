@@ -1,7 +1,6 @@
 namespace NorthwindTraders.Domain.Entities;
 
-
-
+/// A single line item within an order. Maps to dbo.Order Details (composite PK).
 public class OrderDetail
 {
     

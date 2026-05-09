@@ -17,7 +17,7 @@ public class CategoryRepository : ICategoryRepository
     public async Task<IReadOnlyList<Category>> GetAllAsync()
     {
         return await _context.Categories
-            .Include(c => c.Products)
+            .Include(c => c.Products)   // load products so the controller can count them
             .OrderBy(c => c.CategoryName)
             .ToListAsync();
     }
@@ -25,7 +25,7 @@ public class CategoryRepository : ICategoryRepository
     public async Task<Category?> GetByIdAsync(int id)
     {
         return await _context.Categories
-            .Include(c => c.Products)
+            .Include(c => c.Products)   // load full product list for the detail view
             .FirstOrDefaultAsync(c => c.CategoryId == id);
     }
 }

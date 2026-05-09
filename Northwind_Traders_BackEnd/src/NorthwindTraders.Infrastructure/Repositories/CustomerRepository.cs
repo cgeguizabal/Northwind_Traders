@@ -17,7 +17,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<IReadOnlyList<Customer>> GetAllAsync()
     {
         return await _context.Customers
-            .Include(c => c.Orders.Where(o => o.IsActive == "Y")) 
+            .Include(c => c.Orders.Where(o => o.IsActive == "Y"))  // only active orders
             .OrderBy(c => c.CompanyName)
             .ToListAsync();
     }
@@ -27,6 +27,7 @@ public class CustomerRepository : ICustomerRepository
     {
         var query = _context.Customers.AsQueryable();
 
+        // Apply optional full-text search across company name, contact name, city, and country
         if (!string.IsNullOrWhiteSpace(search))
         {
             var q = search.ToLower();
@@ -39,6 +40,7 @@ public class CustomerRepository : ICustomerRepository
 
         var totalCount = await query.CountAsync();
 
+        // Skip — moves past the previous pages; Take — limits to one page of results
         var items = await query
             .OrderBy(c => c.CompanyName)
             .Skip((page - 1) * pageSize)
@@ -62,8 +64,8 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> GetByIdAsync(string customerId)
     {
         return await _context.Customers
-            .Include(c => c.Orders.Where(o => o.IsActive == "Y"))
-                .ThenInclude(o => o.ShipmentState)
+            .Include(c => c.Orders.Where(o => o.IsActive == "Y"))   // only active orders
+                .ThenInclude(o => o.ShipmentState)                  // load status for each order
             .FirstOrDefaultAsync(c => c.CustomerId == customerId);
     }
 

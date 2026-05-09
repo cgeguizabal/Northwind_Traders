@@ -17,7 +17,7 @@ public class SupplierRepository : ISupplierRepository
     public async Task<IReadOnlyList<Supplier>> GetAllAsync()
     {
         return await _context.Suppliers
-            .Include(s => s.Products)
+            .Include(s => s.Products)   // load products so the controller can count them
             .OrderBy(s => s.CompanyName)
             .ToListAsync();
     }
@@ -25,7 +25,7 @@ public class SupplierRepository : ISupplierRepository
     public async Task<Supplier?> GetByIdAsync(int id)
     {
         return await _context.Suppliers
-            .Include(s => s.Products)
+            .Include(s => s.Products)   // load full product list for the detail view
             .FirstOrDefaultAsync(s => s.SupplierId == id);
     }
 }

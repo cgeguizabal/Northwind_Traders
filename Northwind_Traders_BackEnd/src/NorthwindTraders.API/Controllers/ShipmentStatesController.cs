@@ -4,6 +4,8 @@ using NorthwindTraders.Domain.Interfaces;
 
 namespace NorthwindTraders.API.Controllers;
 
+// Read-only lookup for shipment states (e.g. Pending, Shipped, Completed, Cancelled).
+// States are seeded in the database and never managed through the API.
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
@@ -16,7 +18,7 @@ public class ShipmentStatesController : ControllerBase
         _repository = repository;
     }
 
-    // GET api/v1/shipmentstates
+    // GET api/v1/shipmentstates \u2014 returns all available shipment states
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

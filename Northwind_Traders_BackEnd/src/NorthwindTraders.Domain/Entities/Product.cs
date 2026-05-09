@@ -1,7 +1,6 @@
 namespace NorthwindTraders.Domain.Entities;
 
-
-
+/// Product sold by Northwind Traders. Maps to dbo.Products.
 public class Product
 {
     /// Primary key for product.

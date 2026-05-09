@@ -14,6 +14,7 @@ public class ShipmentStateRepository : IShipmentStateRepository
         _context = context;
     }
 
+    // Returns all states ordered by id — preserves the seeded display order
     public async Task<IReadOnlyList<ShipmentState>> GetAllAsync()
     => await _context.ShipmentStates.OrderBy(s => s.ShipmentStateId).ToListAsync();
 

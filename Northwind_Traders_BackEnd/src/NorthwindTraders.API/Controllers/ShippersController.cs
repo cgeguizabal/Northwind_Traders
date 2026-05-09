@@ -5,6 +5,8 @@ using NorthwindTraders.Domain.Interfaces;
 
 namespace NorthwindTraders.API.Controllers;
 
+// Read-only endpoints for shipping companies.
+// Returns shipper details and their associated orders.
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
@@ -17,7 +19,7 @@ public class ShippersController : ControllerBase
         _repository = repository;
     }
 
-    // GET api/v1/shippers
+    // GET api/v1/shippers — returns all shippers with their order count
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -34,7 +36,7 @@ public class ShippersController : ControllerBase
         return Ok(dtos);
     }
 
-    // GET api/v1/shippers/1
+    // GET api/v1/shippers/{id} — returns a single shipper with full order history
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
