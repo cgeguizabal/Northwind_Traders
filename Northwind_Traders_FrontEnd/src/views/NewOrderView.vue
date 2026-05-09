@@ -18,7 +18,6 @@ const toast = useToast();
 const store = useOrderStore();
 
 // ── Dropdown data ──────────────────────────────────────────────
-const customers = ref([]);
 const employees = ref([]);
 const shippers = ref([]);
 const statuses = ref([]);
@@ -196,13 +195,28 @@ const filteredProducts = computed(() =>
 );
 
 const customerSearch = ref("");
-const filteredCustomers = computed(() =>
-  customers.value.filter((c) =>
-    (c.companyName || "")
-      .toLowerCase()
-      .startsWith(customerSearch.value.toLowerCase()),
-  ),
-);
+const customerResults = ref([]);
+const customerLoading = ref(false);
+let customerDebounce;
+
+async function searchCustomers(q) {
+  clearTimeout(customerDebounce);
+  if (!q) {
+    customerResults.value = [];
+    return;
+  }
+  customerDebounce = setTimeout(async () => {
+    customerLoading.value = true;
+    try {
+      const { data } = await getAllCustomers(1, 10, q);
+      customerResults.value = data.items;
+    } catch {
+      /* ignore */
+    } finally {
+      customerLoading.value = false;
+    }
+  }, 300);
+}
 
 function addLine() {
   if (!newLine.productId || newLine.quantity <= 0) {
@@ -295,14 +309,12 @@ function formatCurrency(n) {
 onMounted(async () => {
   loading.value = true;
   try {
-    const [c, e, sh, st, p] = await Promise.all([
-      getAllCustomers(),
+    const [e, sh, st, p] = await Promise.all([
       getAllEmployees(),
       getAllShippers(),
       getAllShipmentStates(),
       getActiveProducts(),
     ]);
-    customers.value = c.data;
     employees.value = e.data;
     shippers.value = sh.data;
     statuses.value = st.data;
@@ -350,10 +362,11 @@ onMounted(async () => {
               v-model="customerSearch"
               list="customer-list"
               class="form-control"
-              placeholder="Search customer..."
+              placeholder="Type to search customer..."
+              @input="searchCustomers(customerSearch)"
               @change="
                 (e) => {
-                  const m = customers.find(
+                  const m = customerResults.find(
                     (c) => c.companyName === e.target.value,
                   );
                   if (m) {
@@ -367,11 +380,12 @@ onMounted(async () => {
             />
             <datalist id="customer-list">
               <option
-                v-for="c in filteredCustomers"
+                v-for="c in customerResults"
                 :key="c.customerId"
                 :value="c.companyName"
               />
             </datalist>
+            <span v-if="customerLoading" class="form-hint">Searching...</span>
             <span v-if="errors.customerId" class="form-error">{{
               errors.customerId
             }}</span>
