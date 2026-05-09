@@ -173,3 +173,32 @@ npm run build
 | ---------------------- | ---------------------------- |
 | `VITE_API_BASE_URL`    | Base URL for the backend API |
 | `VITE_GOOGLE_MAPS_KEY` | Google Maps JS API key       |
+
+---
+
+## Running with Docker
+
+The frontend is built at image-build time by Vite and served by Nginx. There is no Node.js process at runtime.
+
+### Dockerfile stages
+
+| Stage     | Base image            | Purpose                                |
+| --------- | --------------------- | -------------------------------------- |
+| `build`   | `node:lts-alpine`     | Install dependencies + `npm run build` |
+| `runtime` | `nginx:stable-alpine` | Serve `/dist` as static files          |
+
+> `VITE_GOOGLE_MAPS_KEY` is passed as a Docker build argument and baked into the JS bundle at build time.
+
+### Build and run
+
+```bash
+docker build \
+  --build-arg VITE_GOOGLE_MAPS_KEY=your-google-maps-api-key \
+  -t northwind-frontend .
+
+docker run -p 80:80 northwind-frontend
+```
+
+App will be available at `http://localhost`.
+
+> To run **both** services together use `docker compose up --build` from the repository root.

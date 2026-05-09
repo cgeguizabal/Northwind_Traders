@@ -74,6 +74,37 @@ https://localhost:{port}/swagger
 
 ---
 
+## Running with Docker
+
+You can run only the backend container if the frontend is served separately.
+
+### Dockerfile stages
+
+| Stage     | Base image                             | Purpose                    |
+| --------- | -------------------------------------- | -------------------------- |
+| `build`   | `mcr.microsoft.com/dotnet/sdk:10.0`    | Restore packages + publish |
+| `runtime` | `mcr.microsoft.com/dotnet/aspnet:10.0` | Serve the published app    |
+
+### Build and run
+
+```bash
+docker build -t northwind-backend .
+
+docker run -p 5272:5272 \
+  -e ConnectionStrings__DefaultConnection="Server=host.docker.internal;Database=Northwind;User Id=sa;Password=YourPass;TrustServerCertificate=True;" \
+  -e Jwt__Key="your-long-random-secret-min-32-chars" \
+  -e GoogleMaps__ApiKey="your-google-maps-api-key" \
+  -e AllowedOrigins__0="http://localhost" \
+  -e ASPNETCORE_ENVIRONMENT=Production \
+  northwind-backend
+```
+
+API will be available at `http://localhost:5272`.
+
+> To run **both** services together use `docker compose up --build` from the repository root.
+
+---
+
 ## Authentication
 
 All endpoints except `POST /api/v1/auth/login` require a JWT bearer token.

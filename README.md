@@ -87,6 +87,47 @@ App runs at `http://localhost:5173`
 
 ---
 
+## Running with Docker
+
+The full stack (backend API + Vue frontend served by Nginx) can be started with a single command.
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose plugin)
+- A **SQL Server** instance reachable from the Docker host
+- A **Google Maps API key** with the Geocoding and Maps JavaScript APIs enabled
+
+### 1 — Create a `.env` file
+
+Create a `.env` file in the repository root (next to `docker-compose.yml`):
+
+```env
+DB_CONNECTION_STRING=Server=host.docker.internal;Database=Northwind;User Id=sa;Password=YourPass;TrustServerCertificate=True;
+JWT_KEY=your-long-random-secret-min-32-chars
+GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+```
+
+> ⚠️ Never commit `.env` — it is in `.gitignore`.
+
+### 2 — Build and start
+
+```bash
+docker compose up --build
+```
+
+| Service  | URL                   |
+| -------- | --------------------- |
+| Frontend | http://localhost      |
+| Backend  | http://localhost:5272 |
+
+### 3 — Stop
+
+```bash
+docker compose down
+```
+
+---
+
 ## Test Credentials
 
 | Name             | Email                          | Title                    | Password       |
