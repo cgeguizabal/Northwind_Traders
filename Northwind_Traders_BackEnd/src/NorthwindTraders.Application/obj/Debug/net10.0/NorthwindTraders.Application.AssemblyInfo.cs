@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NorthwindTraders.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2b596c0c107206f8867038898e09ca9c1dfaeb65")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0fce5e4dd539d4c47a560a74d7bceee9a568ac62")]
 [assembly: System.Reflection.AssemblyProductAttribute("NorthwindTraders.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NorthwindTraders.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
