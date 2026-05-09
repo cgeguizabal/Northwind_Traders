@@ -26,12 +26,13 @@ public class CustomersControllerTests
         // ARRANGE
         var customers = new List<Customer>
         {
-            new() { CustomerId = "ALFKI", CompanyName = "Alfreds Futterkiste" },
-            new() { CustomerId = "WOLZA", CompanyName = "Wolski Zajazd"       }
+            new() { CustomerId = "ALFKI", CompanyName = "Alfreds Futterkiste", Orders = new List<Order>() },
+            new() { CustomerId = "WOLZA", CompanyName = "Wolski Zajazd",       Orders = new List<Order>() }
         };
 
         var repoMock = new Mock<ICustomerRepository>();
-        repoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(customers);
+        repoMock.Setup(r => r.GetPagedAsync(1, 10, null))
+                .ReturnsAsync(((IReadOnlyList<Customer>)customers, 2));
 
         var controller = BuildController(repoMock);
 
@@ -48,7 +49,8 @@ public class CustomersControllerTests
     {
         // ARRANGE
         var repoMock = new Mock<ICustomerRepository>();
-        repoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Customer>());
+        repoMock.Setup(r => r.GetPagedAsync(1, 10, null))
+                .ReturnsAsync(((IReadOnlyList<Customer>)new List<Customer>(), 0));
 
         var controller = BuildController(repoMock);
 
@@ -65,17 +67,13 @@ public class CustomersControllerTests
     {
         // ARRANGE
         var repoMock = new Mock<ICustomerRepository>();
-        repoMock.Setup(r => r.GetAllAsync())
+        repoMock.Setup(r => r.GetPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string?>()))
                 .ThrowsAsync(new InvalidOperationException("DB context error"));
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetAll();
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<InvalidOperationException>(() => controller.GetAll());
     }
 
     [Fact]
@@ -83,17 +81,13 @@ public class CustomersControllerTests
     {
         // ARRANGE
         var repoMock = new Mock<ICustomerRepository>();
-        repoMock.Setup(r => r.GetAllAsync())
+        repoMock.Setup(r => r.GetPagedAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string?>()))
                 .ThrowsAsync(new OperationCanceledException("Request cancelled"));
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetAll();
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(499, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<OperationCanceledException>(() => controller.GetAll());
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -150,12 +144,8 @@ public class CustomersControllerTests
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetById("ALFKI");
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<InvalidOperationException>(() => controller.GetById("ALFKI"));
     }
 
     [Fact]
@@ -168,12 +158,8 @@ public class CustomersControllerTests
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetById("ALFKI");
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(499, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<OperationCanceledException>(() => controller.GetById("ALFKI"));
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -255,11 +241,7 @@ public class CustomersControllerTests
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetMap("ALFKI");
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<InvalidOperationException>(() => controller.GetMap("ALFKI"));
     }
 }

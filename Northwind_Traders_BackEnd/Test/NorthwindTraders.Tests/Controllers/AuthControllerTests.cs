@@ -95,11 +95,7 @@ public class AuthControllerTests
             Password = "anypassword"
         };
 
-        // ACT
-        var result = await controller.Login(request);
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, status.StatusCode);
+        // ACT & ASSERT — no try-catch in controller; middleware handles it in production
+        await Assert.ThrowsAsync<Exception>(() => controller.Login(request));
     }
 }

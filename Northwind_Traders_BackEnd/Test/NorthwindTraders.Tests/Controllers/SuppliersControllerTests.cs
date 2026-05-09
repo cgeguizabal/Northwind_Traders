@@ -70,12 +70,8 @@ public class SuppliersControllerTests
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetAll();
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<InvalidOperationException>(() => controller.GetAll());
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -132,11 +128,7 @@ public class SuppliersControllerTests
 
         var controller = BuildController(repoMock);
 
-        // ACT
-        var result = await controller.GetById(1);
-
-        // ASSERT
-        var status = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, status.StatusCode);
+        // ACT & ASSERT
+        await Assert.ThrowsAsync<Exception>(() => controller.GetById(1));
     }
 }
