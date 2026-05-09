@@ -5,23 +5,23 @@ import AppLayout from "../components/layout/AppLayout.vue";
 import AppSpinner from "../components/common/AppSpinner.vue";
 import { useToast } from "vue-toastification";
 import { getAllCustomers } from "../axiosInstance/customerService.js";
-import { getAllEmployees } from "../axiosInstance/employeeService.js";
 import { getAllShippers } from "../axiosInstance/shipperService.js";
 import { getAllShipmentStates } from "../axiosInstance/shipmentStateService.js";
-import { getAllProducts } from "../axiosInstance/productService.js";
 import { useOrderStore } from "../stores/orderStore.js";
+import { useEmployeeStore } from "../stores/employeeStore.js";
+import { useProductStore } from "../stores/productStore.js";
 import { validateAddress } from "../axiosInstance/geocodingService.js";
 import { Xmark, MapPin, CheckCircle, WarningCircle } from "iconoir-vue/regular";
 
 const router = useRouter();
 const toast = useToast();
 const store = useOrderStore();
+const employeeStore = useEmployeeStore();
+const productStore = useProductStore();
 
-// ── Dropdown data ──────────────────────────────────────────────
-const employees = ref([]);
+// ── Dropdown data ─────────────────────────────────────────────
 const shippers = ref([]);
 const statuses = ref([]);
-const products = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 
@@ -189,7 +189,7 @@ const newLine = reactive({
 });
 
 const filteredProducts = computed(() =>
-  products.value.filter((p) =>
+  productStore.products.filter((p) =>
     p.productName.toLowerCase().startsWith(productSearch.value.toLowerCase()),
   ),
 );
@@ -223,7 +223,9 @@ function addLine() {
     toast.warning("Select a product and enter a valid quantity.");
     return;
   }
-  const product = products.value.find((p) => p.productId === newLine.productId);
+  const product = productStore.products.find(
+    (p) => p.productId === newLine.productId,
+  );
   form.lines.push({
     productId: newLine.productId,
     productName: product?.productName || "",
@@ -309,16 +311,14 @@ function formatCurrency(n) {
 onMounted(async () => {
   loading.value = true;
   try {
-    const [e, sh, st, p] = await Promise.all([
-      getAllEmployees(),
+    const [sh, st] = await Promise.all([
       getAllShippers(),
       getAllShipmentStates(),
-      getAllProducts(),
+      employeeStore.fetchEmployees(),
+      productStore.fetchProducts(),
     ]);
-    employees.value = e.data;
     shippers.value = sh.data;
     statuses.value = st.data;
-    products.value = p.data;
     // Pre-fill today's date
     form.orderDate = new Date().toISOString().split("T")[0];
   } catch {
@@ -395,7 +395,7 @@ onMounted(async () => {
             <select v-model="form.employeeId" class="form-control">
               <option value="">Select employee...</option>
               <option
-                v-for="e in employees"
+                v-for="e in employeeStore.employees"
                 :key="e.employeeId"
                 :value="e.employeeId"
               >
@@ -645,7 +645,7 @@ onMounted(async () => {
               placeholder="Search product..."
               @change="
                 (e) => {
-                  const m = products.find(
+                  const m = productStore.products.find(
                     (p) => p.productName === e.target.value,
                   );
                   if (m) {

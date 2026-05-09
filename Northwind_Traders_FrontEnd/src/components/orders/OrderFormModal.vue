@@ -4,9 +4,9 @@ import AppModal from "../common/AppModal.vue";
 import AppSpinner from "../common/AppSpinner.vue";
 import { useToast } from "vue-toastification";
 import { getAllShipmentStates } from "../../axiosInstance/shipmentStateService.js";
-import { getAllProducts } from "../../axiosInstance/productService.js";
 import { Xmark, MapPin, CheckCircle, WarningCircle } from "iconoir-vue/regular";
 import { useOrderStore } from "../../stores/orderStore.js";
+import { useProductStore } from "../../stores/productStore.js";
 import { validateAddress } from "../../axiosInstance/geocodingService.js";
 
 const props = defineProps({
@@ -17,10 +17,10 @@ const props = defineProps({
 const emit = defineEmits(["close", "saved"]);
 const toast = useToast();
 const store = useOrderStore();
+const productStore = useProductStore();
 
-// ── Dropdown data ──────────────────────────────────────────────
+// ── Dropdown data ─────────────────────────────────────────────
 const statuses = ref([]);
-const products = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 
@@ -194,14 +194,14 @@ const newLine = reactive({
 // Product search filter for the line-item dropdown
 const productSearch = ref("");
 const filteredProducts = computed(() =>
-  products.value.filter((p) =>
+  productStore.products.filter((p) =>
     p.productName.toLowerCase().includes(productSearch.value.toLowerCase()),
   ),
 );
 
 function onProductSelect(e) {
   const id = Number(e.target.value);
-  const product = products.value.find((p) => p.productId === id);
+  const product = productStore.products.find((p) => p.productId === id);
   if (product) {
     newLine.productId = id;
     newLine.unitPrice = product.unitPrice || 0;
@@ -213,7 +213,9 @@ function addLine() {
     toast.warning("Select a product and enter a valid quantity.");
     return;
   }
-  const product = products.value.find((p) => p.productId === newLine.productId);
+  const product = productStore.products.find(
+    (p) => p.productId === newLine.productId,
+  );
   form.lines.push({
     productId: newLine.productId,
     productName: product?.productName || "",
@@ -300,12 +302,11 @@ async function save() {
 onMounted(async () => {
   loading.value = true;
   try {
-    const [st, p] = await Promise.all([
+    const [st] = await Promise.all([
       getAllShipmentStates(),
-      getAllProducts(),
+      productStore.fetchProducts(),
     ]);
     statuses.value = st.data;
-    products.value = p.data;
 
     // Populate form in edit mode
     if (props.order) {
@@ -578,7 +579,7 @@ function formatCurrency(n) {
             placeholder="Search product..."
             @change="
               (e) => {
-                const match = products.find(
+                const match = productStore.products.find(
                   (p) => p.productName === e.target.value,
                 );
                 if (match) {
